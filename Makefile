@@ -43,7 +43,7 @@ clean: clean_check
 
 ctags:
 	ctags -a -o tags -R --c++-kinds=+p --fields=+iaS --extra=+q \
-		$(src_dir) $(subst -I,, $(pkg_config_cflags))
+		$(src_dir) $(subst -I,, $(pkg_config_cflags)) /usr/include/sqlite3.h
 
 check: $(test_objects)
 	$(CXX) $(CFLAGS) -o $(test_bin) $(test_objects) \

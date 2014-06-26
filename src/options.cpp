@@ -131,8 +131,9 @@ Pdfsearch::Options::parseConfig() {
     std::ifstream file(config.c_str());
     std::ostringstream error;
     if (file.fail()) {
-        error << "can't open file '" << config << "': " << strerror(errno);
-        throw std::ios_base::failure(error.str());
+        std::cerr << "can't open file '" << config << "': "
+            << strerror(errno) << std::endl;
+        return;
     }
 
     std::string line;
