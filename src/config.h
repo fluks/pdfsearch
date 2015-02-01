@@ -10,7 +10,7 @@ namespace Pdfsearch {
     public:
         constexpr static const char* VERSION = "0.01";
         constexpr static const char* PROGRAM_NAME = "pdfsearch";
-        constexpr static const char* CONFIG_FILE = "pdfsearch.conf";
+        constexpr static const char* CONFIG_FILE = "src/dummy.conf";
         constexpr static const char* DATABASE_FILE = "pdfsearch.sqlite";
     private:
         Config() {};
