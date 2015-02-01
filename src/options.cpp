@@ -23,28 +23,31 @@ Pdfsearch::Options::Options(int _argc, char** _argv) :
 }
 
 void
-Pdfsearch::Options::getopt() {
-    /* Read config option and parse config first. */
+Pdfsearch::Options::parseConfigOption() {
     const char* shortopts = "-c:";
-    const struct option config_longopts[] = {
+    const struct option longopts[] = {
         { "config", 1, 0, 'c' },
         { 0, 0, 0, 0 }
     };
 
-    opterr = 0;
     char c;
-    while ((c = getopt_long(argc, argv, shortopts, config_longopts, 0)) != -1) {
-        switch (c) {
-            case 'c':
-                config = optarg;
-                goto break_config;
+    while ((c = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
+        if (c == 'c') {
+            config = optarg;
+            return;
         }
     }
-    break_config:
+}
+
+void
+Pdfsearch::Options::getopt() {
+    /* Read config option first and then parse config file. */
+    opterr = 0;
+    parseConfigOption();
     parseConfig();
     optind = 1;
 
-    shortopts = ":ac:d:f:him:q:r:v";
+    const char* shortopts = ":ac:d:f:him:q:r:v";
     const struct option longopts[] = {
         { "vacuum",      0, 0, 'a' },
         { "config",      1, 0, 'c' },
@@ -54,18 +57,20 @@ Pdfsearch::Options::getopt() {
         { "index",       0, 0, 'i' },
         { "matches",     1, 0, 'm' },
         { "query",       1, 0, 'q' },
-        { "recurse",     1, 0, 'r' },
+        { "recursion",   1, 0, 'r' },
         { "verbose",     0, 0, 'v' },
         { 0, 0, 0, 0 }
     };
 
+    char c;
     while ((c = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
         std::ostringstream error;
         switch (c) {
             case 'a':
                 vacuum = true;
                 break;
-            /* Config already handled. */
+            /* Config already handled, but the option still exists in argv,
+             * don't remove. */
             case 'c': break;
             case 'd':
                 database = optarg;
@@ -74,8 +79,8 @@ Pdfsearch::Options::getopt() {
                 parseDirectories(optarg);
                 break;
             case 'h':
-                printHelp();
                 help = true;
+                /* Ignore other options. */
                 return;
             case 'i':
                 index = true;
@@ -128,38 +133,40 @@ Pdfsearch::Options::validate() const {
 
 void
 Pdfsearch::Options::parseConfig() {
-    std::ifstream file(config.c_str());
-    std::ostringstream error;
-    if (file.fail()) {
-        std::cerr << "can't open file '" << config << "': "
-            << strerror(errno) << std::endl;
-        return;
-    }
+    std::ifstream file;
+    file.exceptions(std::fstream::failbit | std::fstream::badbit);
+    file.open(config);
+
+    using namespace boost;
+    static regex_constants::syntax_option_type flags =
+        regex::perl | regex::icase;
+    static const regex databasePattern("^database\\s*=\\s*(.+)$",       flags);
+    static const regex directoriesPattern("^directories\\s*=\\s*(.+)$", flags);
+    static const regex matchesPattern("^matches\\s*=\\s*(\\d+)$",       flags);
+    static const regex recursionPattern("^recursion\\s*=\\s*(-?\\d+)$", flags);
+    static const regex verbosePattern("^verbose\\s*=\\s*(yes|no)$",     flags);
 
     std::string line;
-    static boost::regex_constants::syntax_option_type flags =
-        boost::regex::perl | boost::regex::icase;
-    static const boost::regex r_database("^database\\s*=\\s*(.+)$", flags);
-    static const boost::regex r_directories("^directories\\s*=\\s*(.+)$", flags);
-    static const boost::regex r_matches("^matches\\s*=\\s*(\\d+)$", flags);
-    static const boost::regex r_recursion("^recursion\\s*=\\s*(-?\\d+)$", flags);
-    static const boost::regex r_verbose("^verbose\\s*=\\s*(yes|no)$", flags);
+    /* If failtbit is set, might throw on eof. */
+    file.exceptions(std::fstream::badbit);
     while (std::getline(file, line).good()) {
-        boost::smatch m;
+        smatch m;
         std::istringstream integer;
-        if (boost::regex_match(line, m, r_database))
+        std::ostringstream error;
+
+        if (regex_match(line, m, databasePattern))
             database = m[1];
-        else if (boost::regex_match(line, m, r_directories))
+        else if (regex_match(line, m, directoriesPattern))
             parseDirectories(m[1].str().c_str());
-        else if (boost::regex_match(line, m, r_matches)) {
+        else if (regex_match(line, m, matchesPattern)) {
             integer.str(m[1]);
             if ((integer >> matches).fail()) {
-                error << "recursion option '" << integer.str() <<
+                error << "matches option '" << integer.str() <<
                     "' doesn't fit to int";
                 throw std::runtime_error(error.str());
             }
         }
-        else if (boost::regex_match(line, m, r_recursion)) {
+        else if (regex_match(line, m, recursionPattern)) {
             integer.str(m[1]);
             if ((integer >> recursion).fail()) {
                 error << "recursion option '" << integer.str() <<
@@ -167,8 +174,11 @@ Pdfsearch::Options::parseConfig() {
                 throw std::runtime_error(error.str());
             }
         }
-        else if (boost::regex_match(line, m, r_verbose)) {
-            verbose = m[1] == "yes" || m[1] == "YES";
+        else if (regex_match(line, m, verbosePattern)) {
+            std::string lowercaseM(m[1].str());
+            std::transform(lowercaseM.begin(), lowercaseM.end(),
+                lowercaseM.begin(), ::tolower);
+            verbose = lowercaseM == "yes";
         }
         else {
             error << "invalid option in configuration file: '" << line << "'";
@@ -202,22 +212,32 @@ Pdfsearch::Options::printHelp() {
 }
 
 void
-Pdfsearch::Options::parseDirectories(const char* _directories) {
-    std::string f;
-    for (; *_directories != '\0'; _directories++) {
-        if (*_directories == ',' &&
-            !f.empty() && f.at(f.size() - 1) != '\\') {
-            directories.push_back(f);
-            f.clear();
+Pdfsearch::Options::parseDirectories(const char* _dirs) {
+    std::string dir;
+    for (; *_dirs != '\0'; _dirs++) {
+        if (*_dirs == '\\') {
+            auto next_char = *(_dirs + 1);
+            if (next_char != '\0') {
+                if (next_char == ',' || next_char == '\\')
+                    dir.push_back(next_char);
+                else {
+                    dir.push_back('\\');
+                    dir.push_back(next_char);
+                }
+                ++_dirs;
+            }
+            else
+                dir.push_back('\\');
         }
-        else if (*_directories == ',' &&
-                 !f.empty() && f.at(f.size() - 1) == '\\')
-            f.replace(f.size() - 1, 1, 1, ',');
+        else if (*_dirs == ',') {
+            directories.push_back(dir);
+            dir.clear();
+        }
         else
-            f.push_back(*_directories);
+            dir.push_back(*_dirs);
     }
-    if (!f.empty())
-        directories.push_back(f);
+    if (!dir.empty())
+        directories.push_back(dir);
 }
 
 int
