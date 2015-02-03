@@ -5,6 +5,7 @@ int
 main() {
     SRunner *sr = srunner_create(suite_options());
     srunner_add_suite(sr, suite_database());
+    srunner_add_suite(sr, suite_database_error());
 
     srunner_run_all(sr, CK_ENV);
     int number_failed = srunner_ntests_failed(sr);

@@ -12,7 +12,8 @@ ifeq ($(DEBUG), yes)
 else
 	CFLAGS += -O2 -DNDEBUG
 endif
-LDLIBS := $(shell pkg-config --libs poppler-cpp sqlite3) -lboost_regex
+LDLIBS := $(shell pkg-config --libs poppler-cpp sqlite3) -lboost_regex \
+	-lboost_system -lboost_filesystem
 
 sources := $(wildcard $(src_dir)*.cpp)
 objects := $(sources:.cpp=.o)
@@ -45,7 +46,7 @@ ctags:
 	ctags -a -o tags -R --c++-kinds=+p --fields=+iaS --extra=+q \
 		$(src_dir) $(subst -I,, $(pkg_config_cflags)) /usr/include/sqlite3.h
 
-check: $(test_objects)
+check: $(objects) $(test_objects)
 	$(CXX) $(CFLAGS) -o $(test_bin) $(test_objects) \
 		$(filter-out %main.o, $(objects)) $(LDLIBS)
 	$(test_bin)

@@ -2,3 +2,5 @@
 pdfsearch
 tags
 tests/test
+a.out
+*.cpp
