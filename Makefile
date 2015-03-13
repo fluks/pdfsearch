@@ -31,7 +31,7 @@ ifeq ($(MAKECMDGOALS), check)
 	CFLAGS += $(shell pkg-config --cflags check)
 endif
 
-.PHONY: all ctags clean check clean_check
+.PHONY: all ctags clean check clean_check cppcheck
 
 all: $(objects)
 	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDLIBS)
@@ -44,7 +44,8 @@ clean: clean_check
 
 ctags:
 	ctags -a -o tags -R --c++-kinds=+p --fields=+iaS --extra=+q \
-		$(src_dir) $(subst -I,, $(pkg_config_cflags)) /usr/include/sqlite3.h
+		$(src_dir) $(subst -I,, $(pkg_config_cflags)) /usr/include/sqlite3.h \
+		/usr/include/boost/filesystem/ /usr/include/boost/regex/ /usr/include/boost/system/
 
 check: $(objects) $(test_objects)
 	$(CXX) $(CFLAGS) -o $(test_bin) $(test_objects) \
@@ -56,3 +57,6 @@ $(test_dir)%.o: %.cpp
 
 clean_check:
 	-$(RM) $(test_dir)/*.o $(test_bin)
+
+cppcheck:
+	cppcheck --enable=warning,information --suppress=missingIncludeSystem $(src_dir)

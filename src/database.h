@@ -3,21 +3,40 @@
 
 #include <sqlite3.h>
 #include <string>
+#include <vector>
+#include <map>
+#include <boost/filesystem.hpp>
+#include "statement.h"
 
 namespace Pdfsearch {
+    class Statement;
+
     /** A database class. */
     class Database {
+        friend class Statement;
+    public:
+        enum class statement_key { IS_PDF_IN_DB, INSERT_PDF, INSERT_PAGE, DELETE_PAGES,
+            UPDATE_PDF };
     private:
         std::string file;
         sqlite3* db;
-        constexpr static const char* TABLE_NAME = u8"pdfs";
-        constexpr static const char* ID_COL = u8"id";
-        constexpr static const char* FILE_COL = u8"file";
-        constexpr static const char* LAST_MODIFIED_COL = u8"last_modified";
-        constexpr static const char* PLAIN_TEXT_COL = u8"plain_text";
-        constexpr static const char* UPDATED_COL = u8"updated";
-        /* A master table name each SQLite database has. */
-        constexpr static const char* MASTER_TABLE = u8"sqlite_master";
+
+        std::map<enum statement_key, const Statement&> initStatements() const;
+
+        void iterateDirectory(const boost::filesystem::path& p, int depth,
+            const int MAX_DEPTH,
+            const std::map<enum statement_key, const Statement&>& statemenets) const;
+
+        void insertPdf(const boost::filesystem::path& p,
+            const std::map<enum statement_key, const Statement&>& statemenets) const;
+
+        void begin() const;
+
+        void commit() const;
+
+        void rollback() const;
+
+        void execute(const std::string& sql) const;
     public:
         /** Default constructor. */
         Database() : db(nullptr) {};
@@ -45,21 +64,24 @@ namespace Pdfsearch {
          * @throws A Database::Error if can't close database.
          */
         void close();
-        /** Create table.
-         * @throws A Database::Error if can't create table.
+        /** Create database.
+         * @throws A Database::Error if can't create database.
          */
-        void createTable() const;
-        /** Check that is table created.
-         * @return True if table exists, false otherwise.
+        void createDatabase() const;
+        /** Check that database is created.
+         * @return True if database exists, false otherwise.
          * @throws A Database::Error if can't query database.
          */
-        bool tableExists() const;
+        bool databaseCreated() const;
         /** Vacuum the database.
          * @see http://www.sqlite.org/lang_vacuum.html
          * @throws A Database::Error if can't vacuum the database.
          */
         void vacuum() const;
         void update() const;
+        void index(const std::vector<std::string>& directories,
+            const int MAX_DEPTH) const;
+        void query(const std::string& query, bool verbose, int matches) const;
     };
 }
 

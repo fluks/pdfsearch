@@ -52,6 +52,44 @@ START_TEST(openDatabaseConnection) {
 }
 END_TEST
 
+START_TEST(createDatabase) {
+    const char* file = "tests/_create.sqlite";
+
+    try {
+        Pdfsearch::Database db(file);
+
+        ck_assert_msg(!db.databaseCreated(), "database not yet created");
+
+        db.createDatabase();
+
+        ck_assert_msg(db.databaseCreated(), "database created");
+    }
+    catch (Pdfsearch::DatabaseError& e) {
+        ck_abort_msg("create database");
+    }
+
+    std::remove(file);
+}
+END_TEST
+
+START_TEST(closeDatabase) {
+    const char* file = "tests/_exists.sqlite";
+
+    try {
+        Pdfsearch::Database db(file);
+        db.close();
+        /* Fails because database connection closed. TODO Should it check if
+         * connection is open? */
+        db.createDatabase();
+
+        ck_abort_msg("close database");
+    }
+    catch (std::exception& e) {
+        ck_assert_msg(true, "close database");
+    }
+}
+END_TEST
+
 Suite*
 suite_database() {
     Suite *suite = suite_create("database");
@@ -62,6 +100,8 @@ suite_database() {
     tcase_add_test(tcase, constructorWithParameter);
     tcase_add_test(tcase, constructorThrowsWithUnreadableFile);
     tcase_add_test(tcase, openDatabaseConnection);
+    tcase_add_test(tcase, createDatabase);
+    tcase_add_test(tcase, closeDatabase);
 
     return suite;
 }

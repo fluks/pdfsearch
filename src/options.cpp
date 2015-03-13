@@ -3,8 +3,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <fstream>
-#include <cstring>
-#include <cerrno>
 #include <boost/regex.hpp>
 #include "options.h"
 
