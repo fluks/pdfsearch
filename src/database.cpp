@@ -62,8 +62,7 @@ Pdfsearch::Database::createDatabase() const {
         u8"create table Pdfs"
             u8"(id            integer primary key asc,"
             u8" file          text unique not null,"
-            u8" last_modified int not null,"
-            u8" updated       int default 1);"
+            u8" last_modified int not null);"
 
         u8"create table Plain_texts"
             u8"(plain_text    text default '',"
@@ -71,10 +70,7 @@ Pdfsearch::Database::createDatabase() const {
             u8" pdfs_id       integer not null references Pdfs(id)"
             u8"                   on delete cascade);"
 
-        u8"create index file_index          on Pdfs(file);"
         u8"create index last_modified_index on Pdfs(last_modified);"
-        u8"create index updated_index       on Pdfs(updated);"
-
         u8"create index pdfs_id_index       on Plain_texts(pdfs_id);";
 
     char* errmsg = nullptr;
