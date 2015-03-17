@@ -33,10 +33,17 @@ namespace Pdfsearch {
          * TODO Use -B -A like in grep, characters before and after match. */
         bool verbose;
 
-        void parseDirectories(const char* _directories);
-        void parseConfig();
-        void parseConfigOption();
-        static int readInt(const char* s, const char* optionName);
+        void
+        parseDirectories(const char* _directories);
+
+        void
+        parseConfig();
+
+        void
+        parseConfigOption();
+
+        static int
+        readInt(const char* s, const char* optionName);
     public:
         enum {
             /** Return all the matches. */
@@ -64,36 +71,69 @@ namespace Pdfsearch {
          * @throws std::ios_base::failure if fails to read config,
          * std::runtime_error on integer overflow or std::invalid_argument on
          * invalid command line argument. */
-        void getopt();
+        void
+        getopt();
         /** Validate options.
          * Check that mutually exclusive options are not given, either index,
          * vacuum or query is given and matches < UNLIMITED_MATCHES. Other
          * kind of option validation happens when option is used.
          * @throws std::invalid_argument if there's an invalid option.
          * */
-        void validate() const;
+        void
+        validate() const;
         /** Print help. */
-        static void printHelp();
-        /** */
-        std::string getConfig() const { return config; };
-        /** */
-        std::string getDatabase() const { return database; };
-        /** */
-        bool getHelp() const { return help; };
-        /** */
-        std::vector<std::string> getDirectories() const { return directories; };
-        /** */
-        bool getIndex() const { return index; };
-        /** */
-        int getMatches() const { return matches; };
-        /** */
-        std::string getQuery() const { return query; };
-        /** */
-        int getRecursion() const { return recursion; };
-        /** */
-        bool getVacuum() const { return vacuum; };
-        /** */
-        bool getVerbose() const { return verbose; };
+        static void
+        printHelp();
+        /** Config file option getter.
+         * @return A path to config file.
+         */
+        std::string
+        getConfig() const { return config; };
+        /** Database file option getter.
+         * @return A path to database file.
+         */
+        std::string
+        getDatabase() const { return database; };
+        /** Help option getter.
+         * @return True if help option was given as argument, false otherwise.
+         */
+        bool
+        getHelp() const { return help; };
+        /** Directories option getter.
+         * @return Directories to search pdfs from.
+         */
+        std::vector<std::string>
+        getDirectories() const { return directories; };
+        /** Index option getter.
+         * @return True if index option was given as argument, false otherwise.
+         */
+        bool
+        getIndex() const { return index; };
+        /** Mathes option getter.
+         * @return Pdfsearch::Options::UNLIMITED_MATCHES to return all matches.
+         */
+        int
+        getMatches() const { return matches; };
+        /** Query option getter.
+         * @return
+         */
+        std::string
+        getQuery() const { return query; };
+        /** Recursion option getter.
+         * @return
+         */
+        int
+        getRecursion() const { return recursion; };
+        /** Vacuum option getter.
+         * @return
+         */
+        bool
+        getVacuum() const { return vacuum; };
+        /** Verbosity option getter.
+         * @return
+         */
+        bool
+        getVerbose() const { return verbose; };
     };
 }
 

@@ -5,7 +5,7 @@
 #include <string>
 #include <type_traits>
 #include <stdexcept>
-#include <memory>
+#include <iostream>
 #include "database.h"
 #include "database_error.h"
 #include "resultrowiterator.h"
@@ -13,16 +13,11 @@
 namespace Pdfsearch {
     class Database;
 
+    /** A class to prepare an SQL statement.
+     */
     class Statement {
     private:
-        // Prepared statement.
-        std::shared_ptr<sqlite3_stmt> statement;
-
-        static sqlite3_stmt*
-        allocatePointer(const Database& db, const std::string& sql);
-
-        static void
-        deletePointer(sqlite3_stmt* statement);
+        sqlite3_stmt* statement;
     public:
         /** Constractor.
          * @param db Database handle.
@@ -49,11 +44,11 @@ namespace Pdfsearch {
         /** Bind a value to a parameter.
          * Example:
          * @code
-         * stmt.bind(10, 1);             // T is int.
-         * stmt.bind<void*>(nullptr, 2); // void* needs template argument.
-         * stmt.bind(3.4, 3);            // T is double.
-         * stmt.bind("bla", 4);          // T is std::string.
-         * @endcode
+           stmt.bind(10, 1);             // T is int.
+           stmt.bind<void*>(nullptr, 2); // void* needs template argument.
+           stmt.bind(3.4, 3);            // T is double.
+           stmt.bind("bla", 4);          // T is std::string.
+           @endcode
          * @param value A value to bind.
          * @param column Number of parameter to bind a value to.
          * @throws DatabaseError if can't bind value.
@@ -101,6 +96,13 @@ namespace Pdfsearch {
     }
 
     template<> inline void
+    Statement::bind<sqlite3_int64>(sqlite3_int64 value, int column) const {
+        int result = sqlite3_bind_int64(statement, column, value);
+        if (result != SQLITE_OK)
+            throw DatabaseError(result, sqlite3_errstr(result));
+    }
+
+    template<> inline void
     Statement::bind<double>(double value, int column) const {
         int result = sqlite3_bind_double(statement, column, value);
         if (result != SQLITE_OK)
@@ -110,7 +112,7 @@ namespace Pdfsearch {
     template<> inline void
     Statement::bind<std::string>(std::string value, int column) const {
         int result = sqlite3_bind_text(statement, column, value.c_str(),
-            value.size(), SQLITE_STATIC);
+            value.size(), SQLITE_TRANSIENT);
         if (result != SQLITE_OK)
             throw DatabaseError(result, sqlite3_errstr(result));
     }

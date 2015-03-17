@@ -6,9 +6,10 @@
 #include "database_error.h"
 
 namespace Pdfsearch {
+     /** A class for a resultset of a SELECT SQL query.
+     */
     class ResultRowIterator {
     private:
-        // Prepared statement.
         sqlite3_stmt* statement;
         // Current number of row.
         sqlite3_int64 row;
@@ -25,18 +26,22 @@ namespace Pdfsearch {
             statement(statement), row(0), columns(0), status(status) {
         };
 
+        // Validate column.
+        // @param column A column number of a resultset, [0, getColumns()[.
+        // @throws Pdfsearch::DatabaseError if there is no rows to return or
+        // if column number is invalid.
         void validateCol(int column) {
             if (status != SQLITE_ROW)
                 throw DatabaseError("resultset not ready");
             if (column < 0 || column >= columns)
-                throw DatabaseError("invalid column");
+                throw DatabaseError("invalid column number");
         }
     public:
         /** Get the iterator to resultset.
          * The first row is ready if there is such.
          * @param statement Prepared statement.
          * @return Resultset.
-         * @throws DatabaseError if step to next row fails.
+         * @throws Pdfsearch::DatabaseError if step to next row fails.
          */
         static ResultRowIterator begin(sqlite3_stmt* statement) {
             ResultRowIterator it(statement, SQLITE_OK);
@@ -57,9 +62,16 @@ namespace Pdfsearch {
         /** Get the next row.
          * Prefix ++ operator.
          * @return This ResultRowIterator.
-         * @throws DatabaseError if step to next row fails.
+         * @throws Pdfsearch::DatabaseError if step to next row fails.
          */
         ResultRowIterator& operator++() {
+            if (status == SQLITE_DONE)
+                throw DatabaseError("out of resultset bounds");
+
+            /*int result = sqlite3_reset(statement);*/
+            /*if (result != SQLITE_OK)*/
+            /*throw DatabaseError(result, sqlite3_errstr(result));*/
+
             status = sqlite3_step(statement);
             if (status != SQLITE_ROW && status != SQLITE_DONE)
                 throw DatabaseError(status, sqlite3_errstr(status));
@@ -74,7 +86,7 @@ namespace Pdfsearch {
         /** Get the next row.
          * Postfix ++ operator.
          * @return Copy of this ResultRowIterator.
-         * @throws DatabaseError if step to next row fails.
+         * @throws Pdfsearch::DatabaseError if step to next row fails.
          */
         ResultRowIterator operator++(int) {
             ResultRowIterator result(*this);
@@ -93,8 +105,7 @@ namespace Pdfsearch {
                 throw std::runtime_error(
                     "can't compare resultsets of different statements");
 
-            return (status == SQLITE_DONE && rhs.status == SQLITE_DONE) ||
-                row == rhs.row;
+            return status == SQLITE_DONE && rhs.status == SQLITE_DONE;
         };
 
         /** Unequality operator.
@@ -106,7 +117,7 @@ namespace Pdfsearch {
         };
 
         /** Get value of a column in resultset.
-         * Valid generic types are int, double and std::string.
+         * Valid generic types are int, sqlite3_int64, double and std::string.
          * Example:
          * @code
          * std::unique_ptr<int> pages(it.column<int>(0));
@@ -150,6 +161,20 @@ namespace Pdfsearch {
 
         return std::unique_ptr<int>(
             new int(sqlite3_column_int(statement, column)));
+    }
+
+    template<> inline std::unique_ptr<sqlite3_int64>
+    ResultRowIterator::column<sqlite3_int64>(int column) {
+        validateCol(column);
+
+        int type = sqlite3_column_type(statement, column);
+        if (type == SQLITE_NULL)
+            return std::unique_ptr<sqlite3_int64>(nullptr);
+        else if (type != SQLITE_INTEGER)
+            throw DatabaseError("column's type is not int");
+
+        return std::unique_ptr<sqlite3_int64>(
+            new sqlite3_int64(sqlite3_column_int(statement, column)));
     }
 
     template<> inline std::unique_ptr<double>
