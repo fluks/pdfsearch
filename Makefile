@@ -6,6 +6,8 @@ CFLAGS := -g -std=c++11 -Wall -Wextra -pedantic -I$(src_dir) \
 	$(pkg_config_cflags)
 # getopt_long()
 CFLAGS += -D_GNU_SOURCE
+# Update dependencies on compile.
+CFLAGS += -MP -MMD
 DEBUG ?= no
 ifeq ($(DEBUG), yes)
 	CFLAGS += -O0
@@ -36,11 +38,14 @@ endif
 all: $(objects)
 	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDLIBS)
 
+# Include dependencies. Needs to be after default goal.
+-include $(sources:.cpp=.d)
+
 %.o: %.cpp
 	$(CXX) $(CFLAGS) -c -o $@ $< 
 
 clean: clean_check
-	-$(RM) $(src_dir)/*.o $(bin)
+	-$(RM) $(src_dir)/*.o $(bin) $(src_dir)/*.d
 
 ctags:
 	ctags -a -o tags -R --c++-kinds=+p --fields=+iaS --extra=+q \
