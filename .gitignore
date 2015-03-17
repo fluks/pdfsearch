@@ -4,3 +4,8 @@ tags
 tests/test
 a.out
 *.cpp
+.gdb_history
+t.sqlite
+plans
+src/*.d
+doc

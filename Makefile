@@ -2,7 +2,7 @@ bin := pdfsearch
 CXX := g++
 pkg_config_cflags := $(shell pkg-config --cflags poppler-cpp sqlite3)
 src_dir := src/
-CFLAGS := -g -std=c++11 -Wall -Wextra -pedantic -I$(src_dir) \
+CFLAGS := -std=c++11 -Wall -Wextra -pedantic -I$(src_dir) \
 	$(pkg_config_cflags)
 # getopt_long()
 CFLAGS += -D_GNU_SOURCE
@@ -10,7 +10,7 @@ CFLAGS += -D_GNU_SOURCE
 CFLAGS += -MP -MMD
 DEBUG ?= no
 ifeq ($(DEBUG), yes)
-	CFLAGS += -O0
+	CFLAGS += -O0 -g3
 else
 	CFLAGS += -O2 -DNDEBUG
 endif
