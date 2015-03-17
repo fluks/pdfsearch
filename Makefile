@@ -33,7 +33,7 @@ ifeq ($(MAKECMDGOALS), check)
 	CFLAGS += $(shell pkg-config --cflags check)
 endif
 
-.PHONY: all ctags clean check clean_check cppcheck
+.PHONY: all ctags clean check clean_check cppcheck doc
 
 all: $(objects)
 	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDLIBS)
@@ -65,3 +65,6 @@ clean_check:
 
 cppcheck:
 	cppcheck --enable=warning,information --suppress=missingIncludeSystem $(src_dir)
+
+doc:
+	doxygen
