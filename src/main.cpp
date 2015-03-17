@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstdlib>
 #include <stdexcept>
 #include <vector>
 #include "options.h"
@@ -12,7 +11,8 @@ main(int argc, char** argv) {
         options.getopt();
         if (options.getHelp()) {
             options.printHelp();
-            exit(EXIT_SUCCESS);
+            // Using exit(), destructors of automatic variables aren't called.
+            return EXIT_SUCCESS;
         }
         options.validate();
 
@@ -35,8 +35,8 @@ main(int argc, char** argv) {
     }
     catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
