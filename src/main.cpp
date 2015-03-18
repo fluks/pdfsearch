@@ -4,6 +4,9 @@
 #include "options.h"
 #include "database.h"
 
+static void
+printResults(const std::vector<Pdfsearch::QueryResult>& results, bool verbose);
+
 int
 main(int argc, char** argv) {
     Pdfsearch::Options options(argc, argv);
@@ -21,8 +24,11 @@ main(int argc, char** argv) {
             db.createDatabase();
 
         std::string query = options.getQuery();
-        if (!query.empty())
-            db.query(query, options.getVerbose(), options.getMatches());
+        if (!query.empty()) {
+            auto results(
+                db.query(query, options.getVerbose(), options.getMatches()));
+            printResults(results, options.getVerbose());
+        }
         else if (options.getIndex()) {
             std::vector<std::string> dirs = options.getDirectories();
             if (dirs.empty())
@@ -39,4 +45,18 @@ main(int argc, char** argv) {
     }
 
     return EXIT_SUCCESS;
+}
+
+static void
+printResults(const std::vector<Pdfsearch::QueryResult>& results, bool verbose) {
+    int i = 1;
+    for (const auto& r : results) {
+        if (verbose) {
+            std::cout.width(3);
+            std::cout << std::left << i++ << " " << r.file << " [" <<
+                r.page << "/" << r.pages << "]: " << r.chunk << std::endl;
+        }
+        else
+            std::cout << r.file << std::endl;
+    }
 }

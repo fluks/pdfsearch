@@ -8,6 +8,7 @@
 
 namespace Pdfsearch {
     /** A class for a PDF document.
+     * @note The class is non-copyable.
      */
     class Pdf {
     private:

@@ -185,7 +185,7 @@ Pdfsearch::Database::update() const {
     commit();
 }
 
-void
+std::vector<Pdfsearch::QueryResult>
 Pdfsearch::Database::query(const std::string& query, bool verbose, int matches)
         const {
     assert(db != nullptr);
@@ -197,29 +197,32 @@ Pdfsearch::Database::query(const std::string& query, bool verbose, int matches)
     const auto& getAllPdfs = statements.at(statement_key::GET_ALL_PDFS2);
     getAllPdfs->bind(q, 1);
 
+    std::vector<QueryResult> results;
+
     boost::regex pattern("((?:\\s+\\S+){0,5}\\s*" + query + "\\s*(?:\\S+\\s+){0,5})",
         boost::regex::icase);
     for (auto it = getAllPdfs->begin();
         it != getAllPdfs->end() && (matches == Options::UNLIMITED_MATCHES ||
                           it.getRow() <= matches);
             it++) {
-        const auto& file(it.column<std::string>(0));
-        const auto& text(it.column<std::string>(1));
-        const auto& page(it.column<int>(2));
-        const auto& pages(it.column<int>(3));
+        QueryResult qr;
+        qr.file = *(it.column<std::string>(0));
 
-        std::cout.width(3);
-        std::cout << std::left << it.getRow() << " ";
-        std::cout << *file;
         if (verbose) {
+            qr.page = *(it.column<int>(2));
+            qr.pages = *(it.column<int>(3));
+
             boost::smatch m;
-            std::string chunk(query);
+            const auto& text(it.column<std::string>(1));
             if (boost::regex_search(text->cbegin(), text->cend(), m, pattern))
-                chunk = std::string(m[1].first, m[1].second);
-            std::cout << " [" << *page << "/" << *pages << "]: " << chunk;
+                qr.chunk = std::string(m[1].first, m[1].second);
+            else
+                qr.chunk = query;
         }
-        std::cout << std::endl;
+        results.push_back(qr);
     }
+
+    return results;
 }
 
 void

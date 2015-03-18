@@ -13,7 +13,20 @@
 namespace Pdfsearch {
     class Statement;
 
-    /** A database class. */
+    /** Return type for Database#query(const std::string&, bool, int) const. */
+    struct QueryResult {
+        std::string file;
+        /** Surrounding string of a match. */
+        std::string chunk;
+        /** Page number of a match. */
+        int page;
+        /** Number of pages in matching pdf. */
+        int pages;
+    };
+
+    /** A database class.
+     * @note The class is non-copyable.
+     */
     class Database {
         friend class Statement;
     public:
@@ -126,12 +139,13 @@ namespace Pdfsearch {
             const int MAX_DEPTH) const;
         /** Find text from pdfs.
          * @param query The phrase to search.
-         * @param verbose If false, print only filenames where the phrase is
-         * found, otherwise, print more information.
+         * @param verbose If false, only QueryResult::file member is set in the
+         * return value, otherwise all members are set.
          * @param matches Limit the number of matches.
          * Options::UNLIMITED_MATCHES to return all matches.
+         * @return Information about matching pages.
          */
-        void
+        std::vector<QueryResult>
         query(const std::string& query, bool verbose, int matches) const;
     };
 }

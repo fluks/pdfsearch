@@ -14,6 +14,7 @@ namespace Pdfsearch {
     class Database;
 
     /** A class to prepare an SQL statement.
+     * @note The class in non-copyable.
      */
     class Statement {
     private:
