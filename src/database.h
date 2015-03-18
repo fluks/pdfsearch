@@ -60,6 +60,14 @@ namespace Pdfsearch {
          * @throws A DatabaseError if can't open database.
          */
         Database(std::string _file);
+        /** Non-copyable. */
+        Database(const Database& other) = delete;
+        /** Non-copyable. */
+        Database& operator=(const Database& other) = delete;
+        /** Non-copyable. */
+        Database(Database&& other) = delete;
+        /** Non-copyable. */
+        Database& operator=(Database&& other) = delete;
         /** Destructor.
          * Closes the database.
          */
