@@ -20,7 +20,8 @@ namespace Pdfsearch {
          */
         Pdf(const std::string& file) :
                 file(file), doc(poppler::document::load_from_file(file)) {
-            throw std::runtime_error("can't load file");
+            if (doc == nullptr)
+                throw std::runtime_error("can't load file");
         }
 
         /** No copying. */
@@ -38,7 +39,7 @@ namespace Pdfsearch {
          * @param page Page number, [0, numberOfPages()].
          * @return A pointer to the text in a page.
          * @throws std::invalid_argument if invalid page parameter given or
-         * if can't create a page.
+         * std::runtime_error if can't create a page.
          */
         std::unique_ptr<std::string>
         getPage(int page) const;
