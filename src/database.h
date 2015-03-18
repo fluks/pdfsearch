@@ -8,6 +8,7 @@
 #include <memory>
 #include <boost/filesystem.hpp>
 #include "statement.h"
+#include "pdf.h"
 
 namespace Pdfsearch {
     class Statement;
@@ -20,7 +21,8 @@ namespace Pdfsearch {
          * initStatements(stmt_map&).
          */
         enum class statement_key { IS_PDF_IN_DB, INSERT_PDF, INSERT_PAGE,
-            DELETE_PAGES, UPDATE_PDF, GET_ALL_PDFS, DELETE_PDF };
+            DELETE_PAGES, UPDATE_PDF, GET_ALL_PDFS1, GET_ALL_PDFS2,
+            DELETE_PDF };
 
         /** Return value of a private funtion initStatements(stmt_map&). */
         typedef std::map<enum statement_key, std::unique_ptr<Pdfsearch::Statement>> stmt_map;
@@ -55,7 +57,7 @@ namespace Pdfsearch {
         Database() : db(nullptr) {};
         /** Construct instance and open database.
          * @param _file Filepath to database.
-         * @throws A Pdfsearch::DatabaseError if can't open database.
+         * @throws A DatabaseError if can't open database.
          */
         Database(std::string _file);
         /** Destructor.
@@ -65,34 +67,34 @@ namespace Pdfsearch {
         /** Open database.
          * Database filepath needs to be initialized in the constructor
          * already.
-         * @throws A Pdfsearch::DatabaseError if can't open database.
+         * @throws A DatabaseError if can't open database.
          */
         void
         open();
         /** Open database.
          * @param Filepath to database.
-         * @throws A Pdfsearch::DatabaseError if can't open database.
+         * @throws A DatabaseError if can't open database.
          */
         void
         open(std::string _file);
         /** Close database.
-         * @throws A Pdfsearch::DatabaseError if can't close database.
+         * @throws A DatabaseError if can't close database.
          */
         void
         close();
         /** Create database.
-         * @throws A Pdfsearch::DatabaseError if can't create database.
+         * @throws A DatabaseError if can't create database.
          */
         void
         createDatabase() const;
         /** Check that database is created.
          * @return True if database exists, false otherwise.
-         * @throws A Pdfsearch::DatabaseError if can't query database.
+         * @throws A DatabaseError if can't query database.
          */
         bool
         databaseCreated() const;
         /** Vacuum the database.
-         * @throws A Pdfsearch::DatabaseError if can't vacuum the database.
+         * @throws A DatabaseError if can't vacuum the database.
          * @see http://www.sqlite.org/lang_vacuum.html
          */
         void
@@ -108,7 +110,7 @@ namespace Pdfsearch {
          * Find pdfs on the filesystem and insert them to the database.
          * @param directories Directories where to look for pdfs.
          * @param MAX_DEPTH A maximum depth to recurse in a directory.
-         * Pdfsearch::Options::RECURSE_INFINITELY to recurse indefinitely, 0 to
+         * Options::RECURSE_INFINITELY to recurse indefinitely, 0 to
          * not to recurse at all.
          */
         void
@@ -119,7 +121,7 @@ namespace Pdfsearch {
          * @param verbose If false, print only filenames where the phrase is
          * found, otherwise, print more information.
          * @param matches Limit the number of matches.
-         * Pdfsearch::Options::UNLIMITED_MATCHES to return all matches.
+         * Options::UNLIMITED_MATCHES to return all matches.
          */
         void
         query(const std::string& query, bool verbose, int matches) const;

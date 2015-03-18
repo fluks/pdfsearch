@@ -51,8 +51,18 @@ namespace Pdfsearch {
             return doc->pages();
         }
 
+        /** Pdf filename getter.
+         * @return Filename of the pdf.
+         */
+        std::string
+        getFile() const {
+            return file;
+        }
+
         /** Check whether filename ends to '.pdf' case-insensitively.
          * @param file Filename.
+         * @throws std::runtime_error if regex takes too much resources (very
+         * unlikely, in practice this can be ignored).
          */
         static bool
         filenameEndsToPdf(const std::string& file);

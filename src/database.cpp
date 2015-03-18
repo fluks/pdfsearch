@@ -8,6 +8,12 @@
 #include "database_error.h"
 #include "options.h"
 
+static void
+insertPages(const Pdfsearch::Pdf& doc, const Pdfsearch::Statement& s);
+
+static int
+numberOfRowsCb(void* rows, int columns, char** result, char** columnName);
+
 Pdfsearch::Database::Database(std::string _file) :
     file(_file),
     db(nullptr) {
@@ -113,16 +119,30 @@ Pdfsearch::Database::vacuum() const {
     execute("vacuum;");
 }
 
+static void
+insertPages(const Pdfsearch::Pdf& doc, const Pdfsearch::Statement& s) {
+    auto file(doc.getFile());
+    for (int i = 0; i < doc.numberOfPages(); i++) {
+        auto text(doc.getPage(i));
+
+        s.bind(*text, 1);
+        s.bind(i + 1, 2);
+        s.bind(file, 3);
+        s.step();
+        s.reset();
+    }
+}
+
 void
 Pdfsearch::Database::update() const {
     assert(db != nullptr);
 
     begin();
-    
+
     stmt_map statements;
     initStatements(statements);
 
-    const auto& getAllPdfs = statements.at(statement_key::GET_ALL_PDFS).get();
+    const auto& getAllPdfs = statements.at(statement_key::GET_ALL_PDFS1).get();
     const auto& deletePdf = statements.at(statement_key::DELETE_PDF).get();
     const auto& deletePages = statements.at(statement_key::DELETE_PAGES).get();
     const auto& insertPage = statements.at(statement_key::INSERT_PAGE).get();
@@ -146,16 +166,15 @@ Pdfsearch::Database::update() const {
                     deletePages->bind(*id, 1);
                     deletePages->step();
                     deletePages->reset();
+
+                    Pdf doc(*file);
+                    insertPages(doc, *insertPage);
                 }
             }
             else {
                 deletePdf->bind(*id, 1);
                 deletePdf->step();
                 deletePdf->reset();
-
-                deletePages->bind(*id, 1);
-                deletePages->step();
-                deletePages->reset();
             }
         }
         catch (std::exception& e) {
@@ -172,17 +191,16 @@ Pdfsearch::Database::query(const std::string& query, bool verbose, int matches)
     assert(db != nullptr);
 
     std::string q("%" + query + "%");
-    Statement s(*this, "select (select file from Pdfs where id = pdfs_id),"
-                           " plain_text, page,"
-                           " (select count(*) from Plain_texts P1"
-                               " where P1.pdfs_id = P2.pdfs_id) from Plain_texts P2"
-                               " where plain_text like ?1;");
-    s.bind(q, 1);
+
+    stmt_map statements;
+    initStatements(statements);
+    const auto& getAllPdfs = statements.at(statement_key::GET_ALL_PDFS2);
+    getAllPdfs->bind(q, 1);
 
     boost::regex pattern("((?:\\s+\\S+){0,5}\\s*" + query + "\\s*(?:\\S+\\s+){0,5})",
         boost::regex::icase);
-    for (auto it = s.begin();
-        it != s.end() && (matches == Options::UNLIMITED_MATCHES ||
+    for (auto it = getAllPdfs->begin();
+        it != getAllPdfs->end() && (matches == Options::UNLIMITED_MATCHES ||
                           it.getRow() <= matches);
             it++) {
         const auto& file(it.column<std::string>(0));
@@ -202,12 +220,6 @@ Pdfsearch::Database::query(const std::string& query, bool verbose, int matches)
         }
         std::cout << std::endl;
     }
-}
-
-bool
-isPdf(const boost::filesystem::path& p) {
-    static const boost::regex pattern(".*\\.pdf$", boost::regex::icase);
-    return boost::regex_match(p.filename().generic_string(), pattern);
 }
 
 void
@@ -231,9 +243,16 @@ Pdfsearch::Database::initStatements(Pdfsearch::Database::stmt_map& m) const {
     m.insert(std::make_pair(statement_key::UPDATE_PDF,
        std::unique_ptr<Statement>(new Statement(*this,
        "update Pdfs set last_modified = ?1 where id = ?2;"))));
-    m.insert(std::make_pair(statement_key::GET_ALL_PDFS,
+    m.insert(std::make_pair(statement_key::GET_ALL_PDFS1,
        std::unique_ptr<Statement>(new Statement(*this,
        "select id, file, last_modified from Pdfs;"))));
+    m.insert(std::make_pair(statement_key::GET_ALL_PDFS2,
+       std::unique_ptr<Statement>(new Statement(*this,
+       "select (select file from Pdfs where id = pdfs_id),"
+           " plain_text, page,"
+           " (select count(*) from Plain_texts P1"
+               " where P1.pdfs_id = P2.pdfs_id) from Plain_texts P2"
+               " where plain_text like ?1;"))));
 }
 
 void
@@ -263,13 +282,8 @@ void
 Pdfsearch::Database::insertPdf(const boost::filesystem::path& p,
     const Pdfsearch::Database::stmt_map& statements
         ) const {
-    auto file = boost::filesystem::canonical(p).native();
-    std::unique_ptr<poppler::document> doc(
-        poppler::document::load_from_file(file));
-    if (doc == nullptr) {
-        std::cerr << "file: " << file << " is not a pdf file" << std::endl;
-        return;
-    }
+    auto file(boost::filesystem::canonical(p).native());
+    Pdf doc(file);
 
     const auto& isPdfInDB = statements.at(statement_key::IS_PDF_IN_DB).get();
     isPdfInDB->bind(file, 1);
@@ -282,6 +296,7 @@ Pdfsearch::Database::insertPdf(const boost::filesystem::path& p,
     isPdfInDB->reset();
 
     const auto& newLastModified(boost::filesystem::last_write_time(p));
+    const auto& insertPage = statements.at(statement_key::INSERT_PAGE).get();
     if (lastModified == nullptr) {
         const auto& insertPdf = statements.at(statement_key::INSERT_PDF).get();
         insertPdf->bind(file, 1);
@@ -289,18 +304,7 @@ Pdfsearch::Database::insertPdf(const boost::filesystem::path& p,
         insertPdf->step();
         insertPdf->reset();
 
-        const auto& insertPage = statements.at(statement_key::INSERT_PAGE).get();
-        for (int i = 0; i < doc->pages(); i++) {
-            std::unique_ptr<poppler::page> page(doc->create_page(i));
-            std::vector<char> chars(page->text().to_utf8());
-            std::string text(chars.begin(), chars.end());
-
-            insertPage->bind(text, 1);
-            insertPage->bind(i + 1, 2);
-            insertPage->bind(file, 3);
-            insertPage->step();
-            insertPage->reset();
-        }
+        insertPages(doc, *insertPage);
     }
     else if (*lastModified < newLastModified) {
         const auto& deletePages = statements.at(statement_key::DELETE_PAGES).get();
@@ -314,18 +318,7 @@ Pdfsearch::Database::insertPdf(const boost::filesystem::path& p,
         updatePdf->step();
         updatePdf->reset();
 
-        const auto& insertPage = statements.at(statement_key::INSERT_PAGE).get();
-        for (int i = 0; i < doc->pages(); i++) {
-            std::unique_ptr<poppler::page> page(doc->create_page(i));
-            std::vector<char> chars(page->text().to_utf8());
-            std::string text(chars.begin(), chars.end());
-
-            insertPage->bind(text, 1);
-            insertPage->bind(i + 1, 2);
-            insertPage->bind(file, 3);
-            insertPage->step();
-            insertPage->reset();
-        }
+        insertPages(doc, *insertPage);
     }
 }
 
@@ -340,13 +333,15 @@ Pdfsearch::Database::iterateDirectory(const boost::filesystem::path& p,
     for (auto it = directory_iterator(p); it != end; ++it) {
         try {
             if (is_directory(it->path()) && !is_symlink(it->path()) &&
-                    (MAX_DEPTH == Options::RECURSE_INFINITELY || depth < MAX_DEPTH))
+                    (MAX_DEPTH == Options::RECURSE_INFINITELY || depth < MAX_DEPTH)) {
                 iterateDirectory(it->path(), ++depth, MAX_DEPTH, statements);
+            }
             else if (is_regular_file(it->path()) && !is_symlink(it->path()) &&
-                    isPdf(it->path()))
+                    Pdf::filenameEndsToPdf(it->path().native())) {
                 insertPdf(it->path(), statements);
+            }
         }
-        catch (filesystem_error& e) {
+        catch (std::exception& e) {
             std::cerr << e.what() << std::endl;
         }
     }
