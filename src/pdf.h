@@ -33,7 +33,7 @@ namespace Pdfsearch {
         Pdf(Pdf&& other) = delete;
         /** No copying. */
         Pdf&
-        operator=(const Pdf&& other) = delete;
+        operator=(Pdf&& other) = delete;
 
         /** Get page text.
          * @param page Page number, [0, numberOfPages()].

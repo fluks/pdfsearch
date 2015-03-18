@@ -21,14 +21,14 @@ namespace Pdfsearch {
 
         // Constructor is private, use end() and begin().
         // @param statement Prepared statement.
-        // @param status 
+        // @param status
         ResultRowIterator(sqlite3_stmt* statement, int status) :
             statement(statement), row(0), columns(0), status(status) {
         };
 
         // Validate column.
         // @param column A column number of a resultset, [0, getColumns()[.
-        // @throws Pdfsearch::DatabaseError if there is no rows to return or
+        // @throws DatabaseError if there is no rows to return or
         // if column number is invalid.
         void validateCol(int column) {
             if (status != SQLITE_ROW)
@@ -41,7 +41,7 @@ namespace Pdfsearch {
          * The first row is ready if there is such.
          * @param statement Prepared statement.
          * @return Resultset.
-         * @throws Pdfsearch::DatabaseError if step to next row fails.
+         * @throws DatabaseError if step to next row fails.
          */
         static ResultRowIterator begin(sqlite3_stmt* statement) {
             ResultRowIterator it(statement, SQLITE_OK);
@@ -62,7 +62,7 @@ namespace Pdfsearch {
         /** Get the next row.
          * Prefix ++ operator.
          * @return This ResultRowIterator.
-         * @throws Pdfsearch::DatabaseError if step to next row fails.
+         * @throws DatabaseError if step to next row fails.
          */
         ResultRowIterator& operator++() {
             if (status == SQLITE_DONE)
@@ -86,7 +86,7 @@ namespace Pdfsearch {
         /** Get the next row.
          * Postfix ++ operator.
          * @return Copy of this ResultRowIterator.
-         * @throws Pdfsearch::DatabaseError if step to next row fails.
+         * @throws DatabaseError if step to next row fails.
          */
         ResultRowIterator operator++(int) {
             ResultRowIterator result(*this);
