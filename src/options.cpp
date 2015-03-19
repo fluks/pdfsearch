@@ -234,32 +234,32 @@ Pdfsearch::Options::printHelp() {
 }
 
 void
-Pdfsearch::Options::parseDirectories(const char* _dirs) {
-    std::string dir;
-    for (; *_dirs != '\0'; _dirs++) {
-        if (*_dirs == '\\') {
-            auto next_char = *(_dirs + 1);
+Pdfsearch::Options::parseDirectories(const char* dirs) {
+    std::string d;
+    for (; *dirs != '\0'; dirs++) {
+        if (*dirs == '\\') {
+            auto next_char = *(dirs + 1);
             if (next_char != '\0') {
                 if (next_char == ',' || next_char == '\\')
-                    dir.push_back(next_char);
+                    d.push_back(next_char);
                 else {
-                    dir.push_back('\\');
-                    dir.push_back(next_char);
+                    d.push_back('\\');
+                    d.push_back(next_char);
                 }
-                ++_dirs;
+                ++dirs;
             }
             else
-                dir.push_back('\\');
+                d.push_back('\\');
         }
-        else if (*_dirs == ',') {
-            directories.push_back(dir);
-            dir.clear();
+        else if (*dirs == ',') {
+            directories.push_back(d);
+            d.clear();
         }
         else
-            dir.push_back(*_dirs);
+            d.push_back(*dirs);
     }
-    if (!dir.empty())
-        directories.push_back(dir);
+    if (!d.empty())
+        directories.push_back(d);
 }
 
 int
