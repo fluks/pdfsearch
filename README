@@ -1,0 +1,4 @@
+RUN
+
+# To use new version of poppler.
+LD_LIBRARY_PATH=/usr/local/lib ./pdfsearch ...

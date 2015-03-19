@@ -9,6 +9,11 @@
 namespace Pdfsearch {
     /** A class for a PDF document.
      * @note The class is non-copyable.
+     * @bug poppler::page leaks. Am I doing something wrong or is there a bug
+     * in poppler? Currently, I'm using an old version of poppler, maybe
+     * updating fixes this.
+     * Update: poppler::document leaks with new version of poppler?
+     * poppler::page doesn't seem to leak.
      */
     class Pdf {
     private:
