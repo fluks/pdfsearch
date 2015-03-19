@@ -68,6 +68,16 @@ namespace Pdfsearch {
          */
         Options(int _argc, char** _argv);
         /** Parse options.
+
+        /** Non-copyable. */
+        Options(const Options& other) = delete;
+        /** Non-copyable. */
+        Options& operator=(const Options& other) = delete;
+        /** Non-copyable. */
+        Options(Options&& other) = delete;
+        /** Non-copyable. */
+        Options& operator=(Options&& other) = delete;
+
          * @throws std::ios_base::failure if fails to read config,
          * std::runtime_error on integer overflow or std::invalid_argument on
          * invalid command line argument. */
