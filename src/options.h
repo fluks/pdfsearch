@@ -68,6 +68,10 @@ namespace Pdfsearch {
          */
         Options(int _argc, char** _argv);
         /** Parse options.
+        /** Destructor.
+         * Frees memory allocated for argv.
+         */
+        ~Options();
 
         /** Non-copyable. */
         Options(const Options& other) = delete;

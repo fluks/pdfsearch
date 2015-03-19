@@ -3,21 +3,45 @@
 #include <sstream>
 #include <stdexcept>
 #include <fstream>
+#include <cstring>
+#include <new>
 #include <boost/regex.hpp>
 #include "options.h"
 
-Pdfsearch::Options::Options(int _argc, char** _argv) :
-    argc(_argc),
-    argv(_argv),
-    config(Pdfsearch::Config::CONFIG_FILE),
-    database(Pdfsearch::Config::DATABASE_FILE),
-    help(false),
-    index(false),
-    matches(UNLIMITED_MATCHES),
-    query(""),
-    recursion(RECURSE_INFINITELY),
-    vacuum(false),
-    verbose(false) {
+Pdfsearch::Options::Options(int argc, char** argv) :
+        argc(argc),
+        argv(nullptr),
+        config(Pdfsearch::Config::CONFIG_FILE),
+        database(Pdfsearch::Config::DATABASE_FILE),
+        help(false),
+        index(false),
+        matches(UNLIMITED_MATCHES),
+        query(""),
+        recursion(RECURSE_INFINITELY),
+        vacuum(false),
+        verbose(false) {
+    this->argv = new char*[argc];
+    size_t i = 0;
+    try {
+        for (; i < static_cast<size_t>(argc); i++) {
+            size_t len = ::strlen(argv[i]) + 1;
+            this->argv[i] = new char[len];
+            ::strcpy(this->argv[i], argv[i]);
+        }
+    }
+    catch (std::bad_alloc& e) {
+        for (size_t j = 0; j < i; j++)
+            delete[] this->argv[j];
+        delete[] this->argv;
+
+        throw e;
+    }
+}
+
+Pdfsearch::Options::~Options() {
+    for (size_t i = 0; i < static_cast<size_t>(argc); i++)
+        delete[] argv[i];
+    delete[] argv;
 }
 
 void
