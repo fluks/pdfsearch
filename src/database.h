@@ -25,6 +25,21 @@ namespace Pdfsearch {
     };
 
     /** A database class.
+     * Example usage:
+     * @code
+       try {
+           Pdfsearch::Database db(file);
+           if (!db.databaseCreated())
+               db.createDatabase();
+
+           db.index(directories, recursionDepth);
+
+           auto results(db.query(text, verbose, matches));
+           // ...
+       }
+       catch (Pdfsearch::DatabaseError& e) {
+           // ...
+       @endcode
      * @note The class is non-copyable.
      */
     class Database {

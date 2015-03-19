@@ -12,3 +12,4 @@ t.cpp
 t1.cpp
 t2.cpp
 tt.cpp
+tests/*.d

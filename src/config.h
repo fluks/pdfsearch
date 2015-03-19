@@ -10,9 +10,13 @@ namespace Pdfsearch {
     struct Config {
         Config() = delete;
 
+        /** */
         constexpr static const char* VERSION = "0.01";
+        /** */
         constexpr static const char* PROGRAM_NAME = "pdfsearch";
+        /** Path to config file. */
         constexpr static const char* CONFIG_FILE = "src/dummy.conf";
+        /** Path to database file. */
         constexpr static const char* DATABASE_FILE = "pdfsearch.sqlite";
     };
 }

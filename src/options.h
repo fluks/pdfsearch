@@ -7,6 +7,16 @@
 
 namespace Pdfsearch {
     /** Class to read command line options.
+     * Example usage:
+     * @code
+       Pdfsearch::Options o(argc, argv);
+       try {
+           o.getopt();
+           o.validate();
+           // Use getters.
+           // ...
+       @endcode
+       @note The class is non-copyable.
      */
     class Options {
     private:
@@ -34,7 +44,7 @@ namespace Pdfsearch {
         bool verbose;
 
         void
-        parseDirectories(const char* _directories);
+        parseDirectories(const char* directories);
 
         void
         parseConfig();
@@ -48,26 +58,26 @@ namespace Pdfsearch {
         enum {
             /** Return all the matches. */
             UNLIMITED_MATCHES = 0,
-            /** Recurse infinitely. A negative value will do. */
+            /** Recurse infinitely. */
             RECURSE_INFINITELY = -1
         };
         /** Create a new Options instance.
-         * @param _argc Number of command line arguments.
-         * @param _argv Command line arguments.
+         * @param argc Number of command line arguments.
+         * @param argv Command line arguments.
          * Sets defaults:
-         *     config: Pdfsearch::Config::CONFIG_FILE
-         *     database: Pdfsearch::Config::DATABASE_FILE
+         *     config: Config::CONFIG_FILE
+         *     database: Config::DATABASE_FILE
          *     directories: empty
          *     help: false
          *     index: false
-         *     matches: UNLIMITED_MATCHES
+         *     matches: Options::UNLIMITED_MATCHES
          *     query: empty string
-         *     recursion: RECURSE_INFINITELY
+         *     recursion: Options::RECURSE_INFINITELY
          *     vacuum: false
          *     verbose: false
+         * @note Copies argv.
          */
-        Options(int _argc, char** _argv);
-        /** Parse options.
+        Options(int argc, char** argv);
         /** Destructor.
          * Frees memory allocated for argv.
          */
@@ -82,9 +92,11 @@ namespace Pdfsearch {
         /** Non-copyable. */
         Options& operator=(Options&& other) = delete;
 
+        /** Parse commandline options.
          * @throws std::ios_base::failure if fails to read config,
          * std::runtime_error on integer overflow or std::invalid_argument on
-         * invalid command line argument. */
+         * invalid command line argument.
+         */
         void
         getopt();
         /** Validate options.
@@ -92,18 +104,18 @@ namespace Pdfsearch {
          * vacuum or query is given and matches < UNLIMITED_MATCHES. Other
          * kind of option validation happens when option is used.
          * @throws std::invalid_argument if there's an invalid option.
-         * */
+         */
         void
         validate() const;
         /** Print help. */
         static void
         printHelp();
-        /** Config file option getter.
+        /** %Config file option getter.
          * @return A path to config file.
          */
         std::string
         getConfig() const { return config; };
-        /** Database file option getter.
+        /** %Database file option getter.
          * @return A path to database file.
          */
         std::string
@@ -124,7 +136,7 @@ namespace Pdfsearch {
         bool
         getIndex() const { return index; };
         /** Mathes option getter.
-         * @return Pdfsearch::Options::UNLIMITED_MATCHES to return all matches.
+         * @return Options::UNLIMITED_MATCHES to return all matches.
          */
         int
         getMatches() const { return matches; };
