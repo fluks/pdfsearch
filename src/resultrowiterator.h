@@ -3,6 +3,7 @@
 
 #include <sqlite3.h>
 #include <stdexcept>
+#include <memory>
 #include "database_error.h"
 
 namespace Pdfsearch {
@@ -10,7 +11,7 @@ namespace Pdfsearch {
      */
     class ResultRowIterator {
     private:
-        sqlite3_stmt* statement;
+        std::shared_ptr<sqlite3_stmt> statement;
         // Current number of row.
         sqlite3_int64 row;
         // Number of columns in current row.
@@ -22,7 +23,7 @@ namespace Pdfsearch {
         // Constructor is private, use end() and begin().
         // @param statement Prepared statement.
         // @param status
-        ResultRowIterator(sqlite3_stmt* statement, int status) :
+        ResultRowIterator(std::shared_ptr<sqlite3_stmt> statement, int status) :
             statement(statement), row(0), columns(0), status(status) {
         };
 
@@ -30,7 +31,8 @@ namespace Pdfsearch {
         // @param column A column number of a resultset, [0, getColumns()[.
         // @throws DatabaseError if there is no rows to return or
         // if column number is invalid.
-        void validateCol(int column) {
+        void
+        validateCol(int column) {
             if (status != SQLITE_ROW)
                 throw DatabaseError("resultset not ready");
             if (column < 0 || column >= columns)
@@ -43,7 +45,8 @@ namespace Pdfsearch {
          * @return Resultset.
          * @throws DatabaseError if step to next row fails.
          */
-        static ResultRowIterator begin(sqlite3_stmt* statement) {
+        static ResultRowIterator
+        begin(std::shared_ptr<sqlite3_stmt> statement) {
             ResultRowIterator it(statement, SQLITE_OK);
             it++;
 
@@ -55,7 +58,8 @@ namespace Pdfsearch {
          * @param statement Prepared statement.
          * @return ResultRowIterator with no more results.
          */
-        static ResultRowIterator end(sqlite3_stmt* statement) {
+        static ResultRowIterator
+        end(std::shared_ptr<sqlite3_stmt> statement) {
             return ResultRowIterator(statement, SQLITE_DONE);
         };
 
@@ -64,7 +68,8 @@ namespace Pdfsearch {
          * @return This ResultRowIterator.
          * @throws DatabaseError if step to next row fails.
          */
-        ResultRowIterator& operator++() {
+        ResultRowIterator&
+        operator++() {
             if (status == SQLITE_DONE)
                 throw DatabaseError("out of resultset bounds");
 
@@ -72,11 +77,11 @@ namespace Pdfsearch {
             /*if (result != SQLITE_OK)*/
             /*throw DatabaseError(result, sqlite3_errstr(result));*/
 
-            status = sqlite3_step(statement);
+            status = sqlite3_step(statement.get());
             if (status != SQLITE_ROW && status != SQLITE_DONE)
                 throw DatabaseError(status, sqlite3_errstr(status));
 
-            columns = sqlite3_column_count(statement);
+            columns = sqlite3_column_count(statement.get());
             if (status == SQLITE_ROW)
                 row++;
 
@@ -88,7 +93,8 @@ namespace Pdfsearch {
          * @return Copy of this ResultRowIterator.
          * @throws DatabaseError if step to next row fails.
          */
-        ResultRowIterator operator++(int) {
+        ResultRowIterator
+        operator++(int) {
             ResultRowIterator result(*this);
             ++(*this);
 
@@ -100,7 +106,8 @@ namespace Pdfsearch {
          * @return True if resultsets are on the same row, false otherwise.
          * @throw if resultsets are for different statements.
          */
-        bool operator==(const ResultRowIterator& rhs) const {
+        bool
+        operator==(const ResultRowIterator& rhs) const {
             if (statement != rhs.statement)
                 throw std::runtime_error(
                     "can't compare resultsets of different statements");
@@ -112,7 +119,8 @@ namespace Pdfsearch {
          * @param rhs Other result.
          * @return False if resultsets are on the same row, true otherwise.
          */
-        bool operator!=(const ResultRowIterator& rhs) const {
+        bool
+        operator!=(const ResultRowIterator& rhs) const {
             return !operator==(rhs);
         };
 
@@ -131,20 +139,22 @@ namespace Pdfsearch {
          * >= number of columns in resultset or if generic type is not the
          * same as column's type.
          */
-        template<typename T>
-        std::unique_ptr<T> column(int column);
+        template<typename T> std::unique_ptr<T>
+        column(int column);
 
         /** Get current row number.
          * @return Current row number.
          */
-        sqlite3_int64 getRow() const {
+        sqlite3_int64
+        getRow() const {
             return row;
         };
 
         /** Get number of columns in the current row.
          * @return Number of columns in the current row.
          */
-        int getColumns() const {
+        int
+        getColumns() const {
             return columns;
         };
     };
@@ -153,49 +163,49 @@ namespace Pdfsearch {
     ResultRowIterator::column<int>(int column) {
         validateCol(column);
 
-        int type = sqlite3_column_type(statement, column);
+        int type = sqlite3_column_type(statement.get(), column);
         if (type == SQLITE_NULL)
             return std::unique_ptr<int>(nullptr);
         else if (type != SQLITE_INTEGER)
             throw DatabaseError("column's type is not int");
 
         return std::unique_ptr<int>(
-            new int(sqlite3_column_int(statement, column)));
+            new int(sqlite3_column_int(statement.get(), column)));
     }
 
     template<> inline std::unique_ptr<sqlite3_int64>
     ResultRowIterator::column<sqlite3_int64>(int column) {
         validateCol(column);
 
-        int type = sqlite3_column_type(statement, column);
+        int type = sqlite3_column_type(statement.get(), column);
         if (type == SQLITE_NULL)
             return std::unique_ptr<sqlite3_int64>(nullptr);
         else if (type != SQLITE_INTEGER)
             throw DatabaseError("column's type is not int");
 
         return std::unique_ptr<sqlite3_int64>(
-            new sqlite3_int64(sqlite3_column_int(statement, column)));
+            new sqlite3_int64(sqlite3_column_int(statement.get(), column)));
     }
 
     template<> inline std::unique_ptr<double>
     ResultRowIterator::column<double>(int column) {
         validateCol(column);
 
-        int type = sqlite3_column_type(statement, column);
+        int type = sqlite3_column_type(statement.get(), column);
         if (type == SQLITE_NULL)
             return std::unique_ptr<double>(nullptr);
         else if (type != SQLITE_FLOAT)
             throw DatabaseError("column's type is not double");
 
         return std::unique_ptr<double>(
-            new double(sqlite3_column_double(statement, column)));
+            new double(sqlite3_column_double(statement.get(), column)));
     }
 
     template<> inline std::unique_ptr<std::string>
     ResultRowIterator::column<std::string>(int column) {
         validateCol(column);
 
-        int type = sqlite3_column_type(statement, column);
+        int type = sqlite3_column_type(statement.get(), column);
         if (type == SQLITE_NULL)
             return std::unique_ptr<std::string>(nullptr);
         else if (type != SQLITE_TEXT)
@@ -203,7 +213,7 @@ namespace Pdfsearch {
 
         return std::unique_ptr<std::string>(new std::string(
             reinterpret_cast<const char*>(
-                sqlite3_column_text(statement, column))));
+                sqlite3_column_text(statement.get(), column))));
     }
 }
 

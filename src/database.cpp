@@ -1,9 +1,6 @@
 #include <cassert>
-#include <sstream>
 #include <iostream>
 #include <boost/regex.hpp>
-#include <poppler-document.h>
-#include <poppler-page.h>
 #include "database.h"
 #include "database_error.h"
 #include "options.h"
