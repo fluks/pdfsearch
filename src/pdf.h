@@ -42,7 +42,7 @@ namespace Pdfsearch {
         operator=(Pdf&& other) = delete;
 
         /** Get page text.
-         * @param page Page number, [0, numberOfPages()].
+         * @param page Page number, [0, numberOfPages()[.
          * @return A pointer to the text in a page.
          * @throws std::invalid_argument if invalid page parameter given or
          * std::runtime_error if can't create a page.

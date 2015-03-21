@@ -4,7 +4,7 @@
 
 std::unique_ptr<std::string>
 Pdfsearch::Pdf::getPage(int i) const {
-    if (i < 0 || i > numberOfPages())
+    if (i < 0 || i >= numberOfPages())
         throw std::invalid_argument("invalid page number");
 
     std::unique_ptr<poppler::page> page(doc->create_page(i));
