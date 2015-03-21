@@ -20,8 +20,14 @@ main(int argc, char** argv) {
         options.validate();
 
         Pdfsearch::Database db(options.getDatabase());
-        if (!db.databaseCreated())
-            db.createDatabase();
+        if (!db.databaseCreated()) {
+            if (options.getIndex())
+                db.createDatabase();
+            else {
+                std::cerr << "database missing" << std::endl;
+                return EXIT_FAILURE;
+            }
+        }
 
         std::string query = options.getQuery();
         if (!query.empty()) {
