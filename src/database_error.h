@@ -12,11 +12,11 @@ namespace Pdfsearch {
         int code;
     public:
         /**
-         * @param _code SQLite error code.
+         * @param code SQLite error code.
          * @param message DatabaseError message.
          */
-        DatabaseError(int _code, const std::string& message) :
-            std::runtime_error(message), code(_code) {
+        DatabaseError(int code, const std::string& message) :
+            std::runtime_error(message), code(code) {
         };
         /**
          * @param message DatabaseError message.

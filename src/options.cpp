@@ -11,8 +11,8 @@
 Pdfsearch::Options::Options(int argc, char** argv) :
         argc(argc),
         argv(nullptr),
-        config(Pdfsearch::Config::CONFIG_FILE),
-        database(Pdfsearch::Config::DATABASE_FILE),
+        config(Config::CONFIG_FILE),
+        database(Config::DATABASE_FILE),
         help(false),
         index(false),
         matches(UNLIMITED_MATCHES),

@@ -53,7 +53,7 @@ namespace Pdfsearch {
             DELETE_PDF };
 
         /** Return value of a private funtion initStatements(stmt_map&). */
-        typedef std::map<enum statement_key, std::unique_ptr<Pdfsearch::Statement>> stmt_map;
+        typedef std::map<enum statement_key, std::unique_ptr<Statement>> stmt_map;
     private:
         std::string file;
         sqlite3* db;
@@ -84,10 +84,10 @@ namespace Pdfsearch {
         /** Default constructor. */
         Database() : db(nullptr) {};
         /** Construct instance and open database.
-         * @param _file Filepath to database.
+         * @param file Filepath to database.
          * @throws A DatabaseError if can't open database.
          */
-        Database(std::string _file);
+        Database(const std::string& file);
         /** Non-copyable. */
         Database(const Database& other) = delete;
         /** Non-copyable. */
@@ -108,11 +108,11 @@ namespace Pdfsearch {
         void
         open();
         /** Open database.
-         * @param Filepath to database.
+         * @param file Filepath to database.
          * @throws A DatabaseError if can't open database.
          */
         void
-        open(std::string _file);
+        open(const std::string& file);
         /** Close database.
          * @throws A DatabaseError if can't close database.
          */

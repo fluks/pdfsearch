@@ -11,8 +11,8 @@ insertPages(const Pdfsearch::Pdf& doc, const Pdfsearch::Statement& s);
 static int
 numberOfRowsCb(void* rows, int columns, char** result, char** columnName);
 
-Pdfsearch::Database::Database(std::string _file) :
-    file(_file),
+Pdfsearch::Database::Database(const std::string& file) :
+    file(file),
     db(nullptr) {
     open();
 }
@@ -43,8 +43,8 @@ Pdfsearch::Database::open() {
 }
 
 void
-Pdfsearch::Database::open(std::string _file) {
-    file = _file;
+Pdfsearch::Database::open(const std::string& file) {
+    this->file = file;
     open();
 }
 
