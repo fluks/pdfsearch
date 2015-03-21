@@ -66,14 +66,14 @@ Pdfsearch::Database::createDatabase() const {
             u8" file          text unique not null,"
             u8" last_modified int not null);"
 
-        u8"create table Plain_texts"
+        u8"create table PlainTexts"
             u8"(plain_text    text default '',"
             u8" page          int not null,"
             u8" pdfs_id       integer not null references Pdfs(id)"
             u8"                   on delete cascade);"
 
         u8"create index last_modified_index on Pdfs(last_modified);"
-        u8"create index pdfs_id_index       on Plain_texts(pdfs_id);";
+        u8"create index pdfs_id_index       on PlainTexts(pdfs_id);";
 
     char* errmsg = nullptr;
     int result = sqlite3_exec(db, sql, nullptr, nullptr, &errmsg);
@@ -232,11 +232,11 @@ Pdfsearch::Database::initStatements(Pdfsearch::Database::stmt_map& m) const {
        "insert into Pdfs(file, last_modified) values(?1, ?2);"))));
     m.insert(std::make_pair(statement_key::INSERT_PAGE,
        std::unique_ptr<Statement>(new Statement(*this,
-       "insert into Plain_texts(plain_text, page, pdfs_id)"
+       "insert into PlainTexts(plain_text, page, pdfs_id)"
            "values(?1, ?2, (select id from Pdfs where file = ?3));"))));
     m.insert(std::make_pair(statement_key::DELETE_PAGES,
        std::unique_ptr<Statement>(new Statement(*this,
-       "delete from Plain_texts where pdfs_id = ?1;"))));
+       "delete from PlainTexts where pdfs_id = ?1;"))));
     m.insert(std::make_pair(statement_key::DELETE_PDF,
        std::unique_ptr<Statement>(new Statement(*this,
        "delete from Pdfs where id = ?1;"))));
@@ -250,8 +250,8 @@ Pdfsearch::Database::initStatements(Pdfsearch::Database::stmt_map& m) const {
        std::unique_ptr<Statement>(new Statement(*this,
        "select (select file from Pdfs where id = pdfs_id),"
            " plain_text, page,"
-           " (select count(*) from Plain_texts P1"
-               " where P1.pdfs_id = P2.pdfs_id) from Plain_texts P2"
+           " (select count(*) from PlainTexts P1"
+               " where P1.pdfs_id = P2.pdfs_id) from PlainTexts P2"
                " where plain_text like ?1;"))));
 }
 
