@@ -117,7 +117,7 @@ namespace Pdfsearch {
     }
 
     template<> inline void
-    Statement::bind<void*>(void* value, int column) const {
+    Statement::bind<void*>(void*, int column) const {
         int result = sqlite3_bind_null(statement.get(), column);
         if (result != SQLITE_OK)
             throw DatabaseError(result, sqlite3_errstr(result));

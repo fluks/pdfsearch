@@ -85,7 +85,7 @@ Pdfsearch::Database::createDatabase() const {
 }
 
 static int
-numberOfRowsCb(void* rows, int columns, char** result, char** columnName) {
+numberOfRowsCb(void* rows, int, char**, char**) {
     int *r = static_cast<int*>(rows);
     (*r)++;
     return 0;
