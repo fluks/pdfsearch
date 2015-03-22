@@ -13,11 +13,13 @@ Pdfsearch::Options::Options(int argc, char** argv) :
         argv(nullptr),
         config(Config::CONFIG_FILE),
         database(Config::DATABASE_FILE),
+        directories({ "." }),
         help(false),
         index(false),
         matches(UNLIMITED_MATCHES),
         query(""),
         recursion(RECURSE_INFINITELY),
+        update(false),
         vacuum(false),
         verbose(false) {
     this->argv = new char*[argc];
@@ -69,17 +71,17 @@ Pdfsearch::Options::getopt() {
     parseConfig();
     optind = 1;
 
-    const char* shortopts = ":ac:d:f:him:q:r:v";
+    const char* shortopts = ":ac:d:hi::m:q:r:uv";
     const struct option longopts[] = {
         { "vacuum",      0, 0, 'a' },
         { "config",      1, 0, 'c' },
         { "database",    1, 0, 'd' },
-        { "directories", 1, 0, 'f' },
         { "help",        0, 0, 'h' },
-        { "index",       0, 0, 'i' },
+        { "index",       2, 0, 'i' },
         { "matches",     1, 0, 'm' },
         { "query",       1, 0, 'q' },
         { "recursion",   1, 0, 'r' },
+        { "update",      0, 0, 'u' },
         { "verbose",     0, 0, 'v' },
         { 0, 0, 0, 0 }
     };
@@ -97,15 +99,21 @@ Pdfsearch::Options::getopt() {
             case 'd':
                 database = optarg;
                 break;
-            case 'f':
-                parseDirectories(optarg);
-                break;
             case 'h':
                 help = true;
                 /* Ignore other options. */
                 return;
             case 'i':
                 index = true;
+                /* There's an argument for index, but not right after option,
+                 * i.e. not: -idir or --index=dir, but: -i dir or --index dir.
+                 * This is needed only when an option has an optional argument.
+                 * XXX Is this correct? */
+                if (!optarg && optind < argc &&
+                        std::string(argv[optind]).substr(0, 1) != "-") {
+                    optarg = argv[optind];
+                }
+                parseDirectories(optarg);
                 break;
             case 'm':
                 matches = readInt(optarg, "matches");
@@ -115,6 +123,9 @@ Pdfsearch::Options::getopt() {
                 break;
             case 'r':
                 recursion = readInt(optarg, "recursion");
+                break;
+            case 'u':
+                update = true;
                 break;
             case 'v':
                 verbose = true;
@@ -135,18 +146,27 @@ Pdfsearch::Options::getopt() {
 void
 Pdfsearch::Options::validate() const {
     if (!index && query.empty() && !vacuum) {
-        throw std::invalid_argument("either index, query or vacuum option "
-            "must be selected");
+        throw std::invalid_argument("either index, query, update or vacuum "
+            "option must be selected");
     }
 
     if (vacuum && index)
         throw std::invalid_argument("vacuum and index options are mutually "
+            "exclusive");
+    if (vacuum && update)
+        throw std::invalid_argument("vacuum and update options are mutually "
             "exclusive");
     if (vacuum && !query.empty())
         throw std::invalid_argument("vacuum and query options are mutually "
             "exclusive");
     if (index && !query.empty())
         throw std::invalid_argument("query and index options are mutually "
+            "exclusive");
+    if (update && !query.empty())
+        throw std::invalid_argument("query and update options are mutually "
+            "exclusive");
+    if (update && index)
+        throw std::invalid_argument("index and update options are mutually "
             "exclusive");
 
     if (matches < UNLIMITED_MATCHES)
@@ -220,22 +240,28 @@ Pdfsearch::Options::printHelp() {
         Config::PROGRAM_NAME << " version " << Config::VERSION    << endl <<
         "Usage: " << Config::PROGRAM_NAME << " [OPTIONS] ..."     << endl <<
         "       " << Config::PROGRAM_NAME << " -q <STRING>"       << endl <<
-        "       " << Config::PROGRAM_NAME << " -i"                << endl <<
+        "       " << Config::PROGRAM_NAME << " -i<DIR> ..."       << endl <<
         "   -a, --vacuum              vacuum database"            << endl <<
         "   -c, --config=FILE         configuration file"         << endl <<
         "   -d, --database=FILE       database file"              << endl <<
-        "   -f, --directories=DIR,... search pdfs from DIRs"      << endl <<
         "   -h, --help"                                           << endl <<
-        "   -i, --index               index and update database"  << endl <<
+        "   -i, --index=[DIR],...     index database searching"   << endl <<
+        "                             pdfs from DIRs"             << endl <<
         "   -m, --matches=N           find N matches for query"   << endl <<
         "   -q, --query=STRING        query the database"         << endl <<
         "   -r, --recursion=N         recurse N directories deep" << endl <<
+        "   -u, --update              update the database"        << endl <<
         "   -v, --verbose             print query context"        << endl;
     cout << help.str();
 }
 
 void
 Pdfsearch::Options::parseDirectories(const char* dirs) {
+    // No directories passed, scan default directory.
+    if (!dirs)
+        return;
+
+    directories.clear();
     std::string d;
     for (; *dirs != '\0'; dirs++) {
         if (*dirs == '\\') {

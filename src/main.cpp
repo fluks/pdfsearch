@@ -35,13 +35,10 @@ main(int argc, char** argv) {
                 db.query(query, options.getVerbose(), options.getMatches()));
             printResults(results, options.getVerbose());
         }
-        else if (options.getIndex()) {
-            std::vector<std::string> dirs = options.getDirectories();
-            if (dirs.empty())
-                db.update();
-            else
-                db.index(dirs, options.getRecursion());
-        }
+        else if (options.getIndex())
+            db.index(options.getDirectories(), options.getRecursion());
+        else if (options.getUpdate())
+            db.update();
         else if (options.getVacuum())
             db.vacuum();
     }

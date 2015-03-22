@@ -27,7 +27,7 @@ namespace Pdfsearch {
         /* Directories to search for pdfs. */
         std::vector<std::string> directories;
         bool help;
-        /* Index or update database. */
+        /* Index database. */
         bool index;
         /* Number of matches to return for query. [UNLIMITED_MATCHES, Inf]. */
         int matches;
@@ -37,6 +37,8 @@ namespace Pdfsearch {
          * directories in this directory, etc.
          * [-Inf, Inf]. */
         int recursion;
+        /* Update database. */
+        bool update;
         /* Vacuum the database. */
         bool vacuum;
         /* Print context for the match.
@@ -67,12 +69,13 @@ namespace Pdfsearch {
          * Sets defaults:
          *     config: Config::CONFIG_FILE
          *     database: Config::DATABASE_FILE
-         *     directories: empty
+         *     directories: current directory('.')
          *     help: false
          *     index: false
          *     matches: Options::UNLIMITED_MATCHES
          *     query: empty string
          *     recursion: Options::RECURSE_INFINITELY
+         *     update: false
          *     vacuum: false
          *     verbose: false
          * @note Copies argv.
@@ -101,8 +104,8 @@ namespace Pdfsearch {
         getopt();
         /** Validate options.
          * Check that mutually exclusive options are not given, either index,
-         * vacuum or query is given and matches < UNLIMITED_MATCHES. Other
-         * kind of option validation happens when option is used.
+         * query, update or vacuum is given and matches < UNLIMITED_MATCHES.
+         * Other kind of option validation happens when option is used.
          * @throws std::invalid_argument if there's an invalid option.
          */
         void
@@ -125,7 +128,7 @@ namespace Pdfsearch {
          */
         bool
         getHelp() const { return help; };
-        /** Directories option getter.
+        /** Get directories for index.
          * @return Directories to search pdfs from.
          */
         std::vector<std::string>
@@ -150,13 +153,18 @@ namespace Pdfsearch {
          */
         int
         getRecursion() const { return recursion; };
+        /** Update option getter.
+         * @return True if update option was given as argument, false otherwise.
+         */
+        bool
+        getUpdate() const { return update; }
         /** Vacuum option getter.
-         * @return
+         * @return True if vacuum option was given as argument, false otherwise.
          */
         bool
         getVacuum() const { return vacuum; };
         /** Verbosity option getter.
-         * @return
+         * @return True if verbose option was given as argument, false otherwise.
          */
         bool
         getVerbose() const { return verbose; };
