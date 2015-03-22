@@ -132,6 +132,7 @@ insertPages(const Pdfsearch::Pdf& doc, const Pdfsearch::Statement& s) {
 
 void
 Pdfsearch::Database::update() const {
+    namespace fs = boost::filesystem; 
     assert(db != nullptr);
 
     begin();
@@ -150,10 +151,9 @@ Pdfsearch::Database::update() const {
             const auto& file(it.column<std::string>(1));
             const auto& lastModified(it.column<sqlite3_int64>(2));
 
-            const boost::filesystem::path p(*file);
-            if (boost::filesystem::exists(p)) {
-                const auto& newLastModified =
-                    boost::filesystem::last_write_time(p);
+            const fs::path p(*file);
+            if (fs::exists(p)) {
+                const auto& newLastModified = fs::last_write_time(p);
                 if (newLastModified > *lastModified) {
                     updatePdf->bind<sqlite3_int64>(newLastModified, 1);
                     updatePdf->bind(*id, 2);
@@ -327,16 +327,17 @@ Pdfsearch::Database::iterateDirectory(const boost::filesystem::path& p,
     int depth, const int MAX_DEPTH,
     const Pdfsearch::Database::stmt_map& statements
         ) const {
-    using namespace boost::filesystem;
+    namespace fs = boost::filesystem;
 
-    auto end = directory_iterator();
-    for (auto it = directory_iterator(p); it != end; ++it) {
+    auto end = fs::directory_iterator();
+    for (auto it = fs::directory_iterator(p); it != end; ++it) {
         try {
-            if (is_directory(it->path()) && !is_symlink(it->path()) &&
+            if (fs::is_directory(it->path()) && !fs::is_symlink(it->path()) &&
                     (MAX_DEPTH == Options::RECURSE_INFINITELY || depth < MAX_DEPTH)) {
                 iterateDirectory(it->path(), ++depth, MAX_DEPTH, statements);
             }
-            else if (is_regular_file(it->path()) && !is_symlink(it->path()) &&
+            else if (fs::is_regular_file(it->path()) &&
+                    !fs::is_symlink(it->path()) &&
                     Pdf::filenameEndsToPdf(it->path().native())) {
                 insertPdf(it->path(), statements);
             }

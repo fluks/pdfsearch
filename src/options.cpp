@@ -155,11 +155,12 @@ Pdfsearch::Options::validate() const {
 
 void
 Pdfsearch::Options::parseConfig() {
+    using namespace boost;
+
     std::ifstream file;
     file.exceptions(std::fstream::failbit | std::fstream::badbit);
     file.open(config);
 
-    using namespace boost;
     static regex_constants::syntax_option_type flags =
         regex::perl | regex::icase;
     static const regex databasePattern("^database\\s*=\\s*(.+)$",       flags);
