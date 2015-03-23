@@ -14,8 +14,9 @@ ifeq ($(DEBUG), yes)
 else
 	override CFLAGS += -O2 -DNDEBUG
 endif
-LDLIBS := $(shell pkg-config --libs poppler-cpp sqlite3) -lboost_regex \
+LDLIBS := $(shell pkg-config --libs-only-l poppler-cpp sqlite3) -lboost_regex \
 	-lboost_system -lboost_filesystem
+LDFLAGS := $(shell pkg-config --libs-only-L poppler-cpp sqlite3)
 
 sources := $(wildcard $(src_dir)*.cpp)
 objects := $(sources:.cpp=.o)
@@ -36,13 +37,13 @@ endif
 .PHONY: all ctags clean check clean_check cppcheck doc
 
 all: $(objects)
-	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDLIBS)
+	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDFLAGS) $(LDLIBS)
 
 # Include dependencies. Needs to be after default goal.
 -include $(sources:.cpp=.d)
 
 %.o: %.cpp
-	$(CXX) $(CFLAGS) -c -o $@ $< 
+	$(CXX) $(CFLAGS) -c -o $@ $<
 
 clean: clean_check
 	-$(RM) $(src_dir)/*.o $(bin) $(src_dir)/*.d
