@@ -17,6 +17,8 @@ endif
 LDLIBS := $(shell pkg-config --libs-only-l poppler-cpp sqlite3) -lboost_regex \
 	-lboost_system -lboost_filesystem
 LDFLAGS := $(shell pkg-config --libs-only-L poppler-cpp sqlite3)
+# Can't find new version of libpoppler-cpp at runtime without this.
+LDFLAGS += -Wl,--rpath,/usr/local/lib
 
 sources := $(wildcard $(src_dir)*.cpp)
 objects := $(sources:.cpp=.o)

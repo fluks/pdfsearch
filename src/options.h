@@ -66,7 +66,7 @@ namespace Pdfsearch {
         /** Create a new Options instance.
          * @param argc Number of command line arguments.
          * @param argv Command line arguments.
-         * Sets defaults:
+         * <pre> Sets defaults:
          *     config: Config::CONFIG_FILE
          *     database: Config::DATABASE_FILE
          *     directories: current directory('.')
@@ -78,6 +78,7 @@ namespace Pdfsearch {
          *     update: false
          *     vacuum: false
          *     verbose: false
+         * </pre>
          * @note Copies argv.
          */
         Options(int argc, char** argv);
