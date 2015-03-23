@@ -31,7 +31,7 @@ Pdfsearch::Options::Options(int argc, char** argv) :
             ::strcpy(this->argv[i], argv[i]);
         }
     }
-    catch (std::bad_alloc& e) {
+    catch (const std::bad_alloc& e) {
         for (size_t j = 0; j < i; j++)
             delete[] this->argv[j];
         delete[] this->argv;
@@ -240,7 +240,7 @@ Pdfsearch::Options::printHelp() {
         Config::PROGRAM_NAME << " version " << Config::VERSION    << endl <<
         "Usage: " << Config::PROGRAM_NAME << " [OPTIONS] ..."     << endl <<
         "       " << Config::PROGRAM_NAME << " -q <STRING>"       << endl <<
-        "       " << Config::PROGRAM_NAME << " -i<DIR> ..."       << endl <<
+        "       " << Config::PROGRAM_NAME << " -i<DIR>,..."       << endl <<
         "   -a, --vacuum              vacuum database"            << endl <<
         "   -c, --config=FILE         configuration file"         << endl <<
         "   -d, --database=FILE       database file"              << endl <<
@@ -295,11 +295,11 @@ Pdfsearch::Options::readInt(const char* s, const char* optionName) {
     try {
         return std::stoi(s, nullptr, 10);
     }
-    catch (std::invalid_argument& e) {
+    catch (const std::invalid_argument& e) {
         error << optionName << " option '" << s << "' is NaN";
         throw std::invalid_argument(error.str());
     }
-    catch (std::out_of_range& e) {
+    catch (const std::out_of_range& e) {
         error << optionName << " option '" << s << "' doesn't fit to int";
         throw std::invalid_argument(error.str());
     }

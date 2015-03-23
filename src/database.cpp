@@ -132,7 +132,7 @@ insertPages(const Pdfsearch::Pdf& doc, const Pdfsearch::Statement& s) {
 
 void
 Pdfsearch::Database::update() const {
-    namespace fs = boost::filesystem; 
+    namespace fs = boost::filesystem;
     assert(db != nullptr);
 
     begin();
@@ -174,7 +174,7 @@ Pdfsearch::Database::update() const {
                 deletePdf->reset();
             }
         }
-        catch (std::exception& e) {
+        catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;
         }
     }
@@ -270,7 +270,7 @@ Pdfsearch::Database::index(const std::vector<std::string>& directories,
             int depth = 0;
             iterateDirectory(d, depth, MAX_DEPTH, statements);
         }
-        catch (boost::filesystem::filesystem_error& e) {
+        catch (const boost::filesystem::filesystem_error& e) {
             std::cerr << e.what() << std::endl;
         }
     }
@@ -342,7 +342,7 @@ Pdfsearch::Database::iterateDirectory(const boost::filesystem::path& p,
                 insertPdf(it->path(), statements);
             }
         }
-        catch (std::exception& e) {
+        catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;
         }
     }

@@ -37,7 +37,7 @@ namespace Pdfsearch {
            auto results(db.query(text, verbose, matches));
            // ...
        }
-       catch (Pdfsearch::DatabaseError& e) {
+       catch (const Pdfsearch::DatabaseError& e) {
            // ...
        @endcode
      * @note The class is non-copyable.
