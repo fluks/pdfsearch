@@ -2,17 +2,17 @@ bin := pdfsearch
 CXX := g++
 pkg_config_cflags := $(shell pkg-config --cflags poppler-cpp sqlite3)
 src_dir := src/
-CFLAGS := -std=c++11 -Wall -Wextra -pedantic -I$(src_dir) \
+override CFLAGS += -std=c++11 -Wall -Wextra -pedantic -I$(src_dir) \
 	$(pkg_config_cflags)
 # getopt_long()
-CFLAGS += -D_GNU_SOURCE
+override CFLAGS += -D_GNU_SOURCE
 # Update dependencies on compile.
-CFLAGS += -MP -MMD
+override CFLAGS += -MP -MMD
 DEBUG ?= no
 ifeq ($(DEBUG), yes)
-	CFLAGS += -O0 -g3
+	override CFLAGS += -O0 -g3
 else
-	CFLAGS += -O2 -DNDEBUG
+	override CFLAGS += -O2 -DNDEBUG
 endif
 LDLIBS := $(shell pkg-config --libs poppler-cpp sqlite3) -lboost_regex \
 	-lboost_system -lboost_filesystem
@@ -30,7 +30,7 @@ test_objects := $(test_sources:.cpp=.o)
 
 ifeq ($(MAKECMDGOALS), check)
 	LDLIBS += $(shell pkg-config --libs check)
-	CFLAGS += $(shell pkg-config --cflags check)
+	override CFLAGS += $(shell pkg-config --cflags check)
 endif
 
 .PHONY: all ctags clean check clean_check cppcheck doc
