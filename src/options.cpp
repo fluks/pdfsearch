@@ -195,6 +195,7 @@ Pdfsearch::Options::parseConfig() {
     static const regex matchesPattern("^matches\\s*=\\s*(\\d+)$",       flags);
     static const regex recursionPattern("^recursion\\s*=\\s*(-?\\d+)$", flags);
     static const regex verbosePattern("^verbose\\s*=\\s*(yes|no)$",     flags);
+    static const regex ignorePattern("^#.*|\\s*$",                      flags);
 
     std::string line;
     /* If failtbit is set, might throw on eof. */
@@ -230,6 +231,8 @@ Pdfsearch::Options::parseConfig() {
                 lowercaseM.begin(), ::tolower);
             verbose = lowercaseM == "yes";
         }
+        else if (regex_match(line, ignorePattern))
+            ;
         else {
             error << "invalid option in configuration file: '" << line << "'";
             throw std::runtime_error(error.str());
