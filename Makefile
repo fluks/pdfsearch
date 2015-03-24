@@ -32,8 +32,7 @@ test_sources := $(wildcard $(test_dir)*.cpp)
 test_objects := $(test_sources:.cpp=.o)
 
 ifeq ($(MAKECMDGOALS), check)
-	LDLIBS += $(shell pkg-config --libs check)
-	override CFLAGS += $(shell pkg-config --cflags check)
+	override CFLAGS += -I$(test_dir)
 endif
 
 .PHONY: all ctags clean check clean_check cppcheck doc
@@ -57,14 +56,14 @@ ctags:
 
 check: $(objects) $(test_objects)
 	$(CXX) $(CFLAGS) -o $(test_bin) $(test_objects) \
-		$(filter-out %main.o, $(objects)) $(LDLIBS)
+		$(filter-out %main.o, $(objects)) $(LDFLAGS) $(LDLIBS)
 	$(test_bin)
 
 $(test_dir)%.o: %.cpp
 	$(CXX) $(CFLAGS) -c -o $@ $<
 
 clean_check:
-	-$(RM) $(test_dir)/*.o $(test_bin)
+	-$(RM) $(test_dir)/*.o $(test_dir)/*.d $(test_bin)
 
 cppcheck:
 	cppcheck --enable=warning,information --suppress=missingIncludeSystem $(src_dir)
