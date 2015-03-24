@@ -41,9 +41,16 @@ Pdfsearch::Options::Options(int argc, char** argv) :
 }
 
 Pdfsearch::Options::~Options() {
+    reset();
+
     for (size_t i = 0; i < static_cast<size_t>(argc); i++)
         delete[] argv[i];
     delete[] argv;
+}
+
+void
+Pdfsearch::Options::reset() {
+    optind = 0;
 }
 
 void

@@ -111,6 +111,13 @@ namespace Pdfsearch {
          */
         void
         validate() const;
+        /** Reset state for parsing command line options again.
+         * If you want to parse command line options again, you need to either
+         * let the previous object call its destructor or call this function.
+         * Failure to comply may lead to segfault.
+         */
+        static void
+        reset();
         /** Print help. */
         static void
         printHelp();
