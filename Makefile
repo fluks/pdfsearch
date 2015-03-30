@@ -55,8 +55,8 @@ ctags:
 		/usr/include/boost/filesystem/ /usr/include/boost/regex/ /usr/include/boost/system/
 
 check: $(objects) $(test_objects)
-	$(CXX) $(CFLAGS) -o $(test_bin) $(test_objects) \
-		$(filter-out %main.o, $(objects)) $(LDFLAGS) $(LDLIBS)
+	$(CXX) $(CFLAGS) -o $(test_bin) $(filter-out %main.o, $(objects)) \
+		$(test_objects) $(LDFLAGS) $(LDLIBS)
 	$(test_bin)
 
 $(test_dir)%.o: %.cpp

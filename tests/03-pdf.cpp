@@ -3,7 +3,7 @@
 #include "catch.hpp"
 
 TEST_CASE("load pdf", "[pdf]") {
-    REQUIRE_NOTHROW(Pdfsearch::Pdf p("tests/pdfs/unicodeexample.pdf"));
+    REQUIRE_NOTHROW(Pdfsearch::Pdf p("tests/pdfs/good1/CrashCourse_FR.PDF"));
 }
 
 TEST_CASE("load not a pdf", "[pdf]") {
@@ -11,7 +11,7 @@ TEST_CASE("load not a pdf", "[pdf]") {
 }
 
 TEST_CASE("pages", "[pdf]") {
-    Pdfsearch::Pdf p("tests/pdfs/unicodeexample.pdf");
+    Pdfsearch::Pdf p("tests/pdfs/good1/good2/unicodeexample.pdf");
 
     SECTION("has a certain number of pages") {
         REQUIRE(p.numberOfPages() == 6);

@@ -1,4 +1,6 @@
 #include <cstring>
+#include <limits>
+#include <sstream>
 #include "options.h"
 #include "config.h"
 #include "catch.hpp"
@@ -94,4 +96,186 @@ TEST_CASE("config", "[options]") {
     REQUIRE(o.getMatches() == 5);
     REQUIRE(o.getRecursion() == 3);
     REQUIRE(o.getVerbose());
+}
+
+TEST_CASE("command line options override config", "[options]") {
+    const char* argv[] = { "", "-ctests/test1.conf", "--recursion=-1" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE(o.getRecursion() == -1);
+}
+
+TEST_CASE("invalid option", "[options]") {
+    const char* argv[] = { "", "-w" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+
+    REQUIRE_THROWS_AS(o.getopt(), std::invalid_argument);
+}
+
+TEST_CASE("matches is NaN", "[options]") {
+    const char* argv[] = { "", "-ma" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+
+    REQUIRE_THROWS_AS(o.getopt(), std::invalid_argument);
+}
+
+TEST_CASE("missing argument", "[options]") {
+    const char* argv[] = { "", "-r" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+
+    REQUIRE_THROWS_AS(o.getopt(), std::invalid_argument);
+}
+
+TEST_CASE("integer overflow", "[options]") {
+    long long l = std::numeric_limits<int>::max() + 1LL;
+    std::ostringstream oss;
+    oss << l;
+    const char* argv[] = { "", "-r", oss.str().c_str() };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+
+    REQUIRE_THROWS_AS(o.getopt(), std::invalid_argument);
+}
+
+TEST_CASE("invalid config", "[options]") {
+    const char* argv[] = { "", "--config=tests/invalid.conf" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+
+    REQUIRE_THROWS_AS(o.getopt(), std::runtime_error);
+}
+
+TEST_CASE("validate - no options", "[options]") {
+    const char* argv[] = { "" };
+    Pdfsearch::Options o(1, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - mutually exclusive1", "[options]") {
+    const char* argv[] = { "", "-i", "-a" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - mutually exclusive2", "[options]") {
+    const char* argv[] = { "", "-qpera", "--index" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - mutually exclusive3", "[options]") {
+    const char* argv[] = { "", "-u", "--index" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - mutually exclusive4", "[options]") {
+    const char* argv[] = { "", "-qkalle", "--vacuum" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - mutually exclusive5", "[options]") {
+    const char* argv[] = { "", "--update", "--vacuum" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - mutually exclusive6", "[options]") {
+    const char* argv[] = { "", "--update", "--query", "bbb" };
+    Pdfsearch::Options o(4, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - negative matches", "[options]") {
+    const char* argv[] = { "", "-qaa", "-m-1" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_THROWS_AS(o.validate(), std::invalid_argument);
+}
+
+TEST_CASE("validate - ok1", "[options]") {
+    const char* argv[] = { "", "-i" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_NOTHROW(o.validate());
+}
+
+TEST_CASE("directories1", "[options]") {
+    const char* argv[] = { "", "-ia,b,c" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+    o.getopt();
+    const auto& dirs = o.getDirectories();
+    decltype(dirs) expectedDirs { "a", "b", "c" };
+
+    REQUIRE(dirs.size() == 3);
+    REQUIRE(std::equal(dirs.begin(), dirs.end(), expectedDirs.begin()));
+}
+
+TEST_CASE("directories2", "[options]") {
+    // Why this doesn't work?
+    //const char* argv[] = { "", u8"-index€,öäå,a b c" };
+    const char* argv[] = { "", u8"--index", "€,öäå,a b c" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+    o.getopt();
+    const auto& dirs = o.getDirectories();
+    decltype(dirs) expectedDirs { u8"€", u8"öäå", u8"a b c" };
+
+    REQUIRE(dirs.size() == expectedDirs.size());
+    REQUIRE(std::equal(dirs.begin(), dirs.end(), expectedDirs.begin()));
+}
+
+TEST_CASE("directories3", "[options]") {
+    const char* argv[] = { "", "-ikal\\,le,toinen" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+    o.getopt();
+    const auto& dirs = o.getDirectories();
+    decltype(dirs) expectedDirs { "kal,le", "toinen" };
+
+    REQUIRE(dirs.size() == expectedDirs.size());
+    REQUIRE(std::equal(dirs.begin(), dirs.end(), expectedDirs.begin()));
+}
+
+TEST_CASE("directories4", "[options]") {
+    const char* argv[] = { "", "--index=\\\\,\\" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+    o.getopt();
+    const auto& dirs = o.getDirectories();
+    decltype(dirs) expectedDirs { "\\", "\\" };
+
+    REQUIRE(dirs.size() == expectedDirs.size());
+    REQUIRE(std::equal(dirs.begin(), dirs.end(), expectedDirs.begin()));
+}
+
+TEST_CASE("directories5", "[options]") {
+    const char* argv[] = { "", "-ia\\b,c" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+    o.getopt();
+    const auto& dirs = o.getDirectories();
+    decltype(dirs) expectedDirs { "a\\b", "c" };
+
+    REQUIRE(dirs.size() == expectedDirs.size());
+    REQUIRE(std::equal(dirs.begin(), dirs.end(), expectedDirs.begin()));
+}
+
+TEST_CASE("config file not found", "[options]") {
+    const char* argv[] = { "", "-i", "--config=does_not_exist.conf" };
+    Pdfsearch::Options o(3, const_cast<char**>(argv));
+
+    REQUIRE_THROWS_AS(o.getopt(), std::ios_base::failure);
 }
