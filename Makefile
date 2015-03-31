@@ -35,7 +35,7 @@ ifeq ($(MAKECMDGOALS), check)
 	override CFLAGS += -I$(test_dir)
 endif
 
-.PHONY: all ctags clean check clean_check cppcheck doc
+.PHONY: all ctags clean check check_compile_only clean_check cppcheck doc
 
 all: $(objects)
 	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDFLAGS) $(LDLIBS)
@@ -57,7 +57,12 @@ ctags:
 check: $(objects) $(test_objects)
 	$(CXX) $(CFLAGS) -o $(test_bin) $(filter-out %main.o, $(objects)) \
 		$(test_objects) $(LDFLAGS) $(LDLIBS)
-	$(test_bin)
+	if [ "$(run_check)" != no ]; then \
+		$(test_bin); \
+	fi
+
+check_compile_only: run_check := no
+check_compile_only: check
 
 $(test_dir)%.o: %.cpp
 	$(CXX) $(CFLAGS) -c -o $@ $<
