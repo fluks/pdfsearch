@@ -35,7 +35,7 @@ ifeq ($(MAKECMDGOALS), check)
 	override CFLAGS += -I$(test_dir)
 endif
 
-.PHONY: all ctags clean check check_compile_only clean_check cppcheck doc
+.PHONY: all ctags clean check check_compile_only clean_check cppcheck doc man
 
 all: $(objects)
 	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDFLAGS) $(LDLIBS)
@@ -74,4 +74,7 @@ cppcheck:
 	cppcheck --enable=warning,information --suppress=missingIncludeSystem $(src_dir)
 
 doc:
-	doxygen
+	@doxygen
+
+man:
+	@pod2man --release --center 'General Commands Manual' doc/pdfsearch.pod doc/pdfsearch.1

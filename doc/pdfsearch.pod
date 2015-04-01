@@ -1,0 +1,78 @@
+=head1 NAME
+
+pdfsearch - Index and search pdf documents.
+
+=head1 SYNOPSIS
+
+ # Index all pdfs in root.
+ pdfsearch -i / 
+
+ # Update database.
+ pdfsearch -u -d mypdfs.sqlite
+
+ # Query database.
+ pdfsearch -q sql -c mypdfs.conf
+
+=head1 DESCRIPTION
+
+pdfsearch creates a database from pdfs in the file system. After that, the database can be used
+to search text from all the indexed pdfs.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -a, --vacuum
+
+Vacuum the database. Database is reorganized to make querying faster. File size can get smaller
+too. Do this when a lot of new pdfs are indexed or pdfs are removed or moved in file system and the
+database is updated. L<https://www.sqlite.org/lang_vacuum.html>
+
+=item -c I<FILE>, --config=I<FILE>
+
+A path to config I<FILE>.
+
+=item -d I<FILE>, --database=I<FILE>
+
+A path to database I<FILE>.
+
+=item -h, --help
+
+Print help.
+
+=item -i [I<DIR>],..., --index=[I<DIR>],...
+
+Find pdfs to add to the database from the directories. Directories are separated by commas. If a directory
+name has a comma, it can be escaped by '\' or quote the name. Default is to search current directory.
+
+=item -m I<NUM>, --matches=I<NUM>
+
+Print I<NUM> matches when quering. Default is to print all matches.
+
+=item -q I<STRING>, --query=I<STRING>
+
+Query the database. The search is case-insensitive. There are two metacharacters to use. 'I<_>' matches zero
+or one character. 'I<%>' matches zero or more characters.
+
+=item -r I<NUM>, --recursion=I<NUM>
+
+Recurse I<NUM> level deep to directories. 0 is to not recurse at all, 1 is to recurse to directories in
+directories, etc. Default is to recurse indefinitely.
+
+=item -u, --update
+
+Update database. Changed pdfs are reinserted and pdfs not found in file system are deleted.
+
+=item -v, --verbose
+
+When querying the database, print pages and surrounding text near the match.
+
+=back
+
+=head1 FILES
+
+F<~/.pdfsearch/pdfsearch.conf>
+
+F<~/.pdfsearch/pdfsearch.sqlite>
+
+=cut
