@@ -23,8 +23,14 @@ LDFLAGS += -Wl,--rpath,/usr/local/lib
 sources := $(wildcard $(src_dir)*.cpp)
 objects := $(sources:.cpp=.o)
 
-PREFIX := $(abspath build)
+PREFIX := /usr/local/
 prefix_file := prefix
+# Read and use the prefix, defined in install, on uninstall.
+ifeq (uninstall, $(MAKECMDGOALS))
+	PREFIX := $(if $(wildcard $(prefix_file)), \
+		$(shell read -r line < $(prefix_file) && echo $$line), \
+		$(PREFIX))
+endif
 
 test_dir := tests/
 test_bin := $(test_dir)test
@@ -35,7 +41,8 @@ ifeq ($(MAKECMDGOALS), check)
 	override CFLAGS += -I$(test_dir)
 endif
 
-.PHONY: all ctags clean check check_compile_only clean_check cppcheck doc man
+.PHONY: all ctags clean check check_compile_only clean_check cppcheck doc man \
+	install uninstall reset
 
 all: $(objects)
 	$(CXX) $(CFLAGS) -o $(bin) $(objects) $(LDFLAGS) $(LDLIBS)
@@ -78,3 +85,26 @@ doc:
 
 man:
 	@pod2man --release --center 'General Commands Manual' doc/pdfsearch.pod doc/pdfsearch.1
+
+install:
+	# Save original config.h.
+	[ ! -e "$(src_dir)/config.h.orig" ] && cp $(src_dir)/config.h $(src_dir)/config.h.orig
+	sed -i \
+		-e 's/\(CONFIG_FILE =\).*/\1 "$(subst /,\/,$(HOME))\/.$(bin)\/$(bin).conf";/' \
+		-e 's/\(DATABASE_FILE =\).*/\1 "$(subst /,\/,$(HOME))\/.$(bin)\/$(bin).sqlite";/' \
+			$(src_dir)/config.h
+	make
+	echo $(PREFIX) > $(prefix_file)
+	mkdir -p $(PREFIX)/bin
+	cp $(bin) $(PREFIX)/bin
+	-mkdir $(HOME)/.$(bin)
+	cp $(src_dir)/dummy.conf $(HOME)/.$(bin)/$(bin).conf
+	-mkdir -p $(PREFIX)/man/man1
+	-cp doc/$(bin).1 $(PREFIX)/man/man1/
+
+uninstall:
+	$(RM) $(PREFIX)/bin/$(bin)
+	$(RM) $(PREFIX)/man/man1/$(bin).1
+
+reset:
+	[ -e "$(src_dir)/config.h.orig" ] && mv $(src_dir)/config.h.orig $(src_dir)/config.h
