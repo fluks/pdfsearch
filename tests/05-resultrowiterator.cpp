@@ -11,7 +11,7 @@ namespace fs = boost::filesystem;
 using namespace Pdfsearch;
 
 TEST_CASE("resultrowiterator operator==", "[resultrowiterator]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -30,7 +30,7 @@ TEST_CASE("resultrowiterator operator==", "[resultrowiterator]") {
 }
 
 TEST_CASE("resultrowiterator operator!=", "[resultrowiterator]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -49,7 +49,7 @@ TEST_CASE("resultrowiterator operator!=", "[resultrowiterator]") {
 }
 
 TEST_CASE("resultrowiterator getRow", "[resultrowiterator]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -69,7 +69,7 @@ TEST_CASE("resultrowiterator getRow", "[resultrowiterator]") {
 }
 
 TEST_CASE("resultrowiterator getColumns", "[resultrowiterator]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -89,7 +89,7 @@ TEST_CASE("resultrowiterator getColumns", "[resultrowiterator]") {
 }
 
 TEST_CASE("resultrowiterator column ok", "[resultrowiterator]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -123,7 +123,7 @@ TEST_CASE("resultrowiterator column ok", "[resultrowiterator]") {
 }
 
 TEST_CASE("resultrowiterator column fail", "[resultrowiterator]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 

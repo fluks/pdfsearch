@@ -1,0 +1,4 @@
+- Ideally, this program would support more filetypes, not just pdfs.
+- RDBMS isn't optimal for this kind of text search program. Lucene would be
+better. https://lucene.apache.org/ There's a C++ library also.
+- Find and print only one match for one pdf.

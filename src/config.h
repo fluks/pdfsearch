@@ -15,7 +15,7 @@ namespace Pdfsearch {
         /** */
         constexpr static const char* PROGRAM_NAME = "pdfsearch";
         /** Path to config file. */
-        constexpr static const char* CONFIG_FILE = "src/dummy.conf";
+        constexpr static const char* CONFIG_FILE = "../src/dummy.conf";
         /** Path to database file. */
         constexpr static const char* DATABASE_FILE = "pdfsearch.sqlite";
     };

@@ -83,7 +83,7 @@ TEST_CASE("long options", "[options]") {
 }
 
 TEST_CASE("config", "[options]") {
-    const char* argv[] = { "", "-ctests/test1.conf" };
+    const char* argv[] = { "", "-ctest1.conf" };
     Pdfsearch::Options o(2, const_cast<char**>(argv));
     o.getopt();
     const auto& dirs = o.getDirectories();
@@ -99,7 +99,7 @@ TEST_CASE("config", "[options]") {
 }
 
 TEST_CASE("command line options override config", "[options]") {
-    const char* argv[] = { "", "-ctests/test1.conf", "--recursion=-1" };
+    const char* argv[] = { "", "-ctest1.conf", "--recursion=-1" };
     Pdfsearch::Options o(3, const_cast<char**>(argv));
     o.getopt();
 
@@ -138,7 +138,7 @@ TEST_CASE("integer overflow", "[options]") {
 }
 
 TEST_CASE("invalid config", "[options]") {
-    const char* argv[] = { "", "--config=tests/invalid.conf" };
+    const char* argv[] = { "", "--config=invalid.conf" };
     Pdfsearch::Options o(2, const_cast<char**>(argv));
 
     REQUIRE_THROWS_AS(o.getopt(), std::runtime_error);

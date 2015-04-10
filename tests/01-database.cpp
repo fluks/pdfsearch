@@ -25,7 +25,7 @@ TEST_CASE("database constructor1", "[database]") {
 }
 
 TEST_CASE("database constructor2", "[database]") {
-    std::string file("./tests/testdb");
+    std::string file("./testdb");
 
     REQUIRE_NOTHROW(Database db(file));
     REQUIRE(fs::exists(file));
@@ -35,13 +35,13 @@ TEST_CASE("database constructor2", "[database]") {
 
 TEST_CASE("database constructor fail", "[database]") {
     // Can't open a directory.
-    REQUIRE_THROWS_AS(Database db("./tests"),
+    REQUIRE_THROWS_AS(Database db("./pdfs"),
         DatabaseError);
 } 
 
 TEST_CASE("database open", "[database]") {
     Database db;
-    std::string file("./tests/testdb");
+    std::string file("./testdb");
 
     REQUIRE_NOTHROW(db.open(file));
     REQUIRE(fs::exists(file));
@@ -52,13 +52,13 @@ TEST_CASE("database open", "[database]") {
 TEST_CASE("database open existing database", "[database]") {
     Database db;
 
-    REQUIRE_NOTHROW(db.open("./tests/existing_testdb.sqlite"));
+    REQUIRE_NOTHROW(db.open("./existing_testdb.sqlite"));
     REQUIRE_NOTHROW(db.databaseCreated());
 }
 
 // Don't know how to really test this.
 TEST_CASE("database close", "[database]") {
-    std::string file("./tests/testdb");
+    std::string file("./testdb");
     Database db(file);
     REQUIRE_NOTHROW(db.close());
 
@@ -66,7 +66,7 @@ TEST_CASE("database close", "[database]") {
 }
 
 TEST_CASE("database databaseCreated", "[database]") {
-    std::string file("./tests/testdb");
+    std::string file("./testdb");
     Database db(file);
 
     REQUIRE(!db.databaseCreated());
@@ -75,7 +75,7 @@ TEST_CASE("database databaseCreated", "[database]") {
 }
 
 TEST_CASE("database createDatabase", "[database]") {
-    std::string file("./tests/testdb");
+    std::string file("./testdb");
     Database db(file);
 
     REQUIRE_NOTHROW(db.createDatabase());
@@ -85,7 +85,7 @@ TEST_CASE("database createDatabase", "[database]") {
 }
 
 TEST_CASE("database vacuum", "[database]") {
-    std::string file("./tests/testdb");
+    std::string file("./testdb");
     Database db(file);
     db.createDatabase();
 
@@ -101,11 +101,11 @@ TEST_CASE("database vacuum", "[database]") {
 }
 
 TEST_CASE("database index1", "[database]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     fs::remove(dbFile);
     Database db(dbFile);
     db.createDatabase();
-    std::vector<std::string> dirs{ "./tests/pdfs/" };
+    std::vector<std::string> dirs{ "./pdfs/" };
 
     REQUIRE_NOTHROW(db.index(dirs, Options::RECURSE_INFINITELY));
 
@@ -118,7 +118,7 @@ TEST_CASE("database index1", "[database]") {
 
         boost::regex p("\\.pdf$", boost::regex::icase);
         decltype(dbFiles) fsFiles;
-        findFiles(std::inserter(fsFiles, fsFiles.begin()), "./tests/pdfs/good1", p);
+        findFiles(std::inserter(fsFiles, fsFiles.begin()), "./pdfs/good1", p);
 
         REQUIRE(std::equal(fsFiles.begin(), fsFiles.end(), dbFiles.begin()));
     }
@@ -126,7 +126,7 @@ TEST_CASE("database index1", "[database]") {
     SECTION("update newer pdf") {
         Statement s(db,
             "select last_modified from pdfs where file = ?1;");
-        fs::path pdf = fs::canonical("./tests/pdfs/good1/CrashCourse_FR.PDF");
+        fs::path pdf = fs::canonical("./pdfs/good1/CrashCourse_FR.PDF");
         s.bind(pdf.native(), 1);
         time_t lastModifiedOld = 0;
         for (auto it = s.begin(); it != s.end(); it++)
@@ -149,7 +149,7 @@ TEST_CASE("database index1", "[database]") {
     SECTION("do nothing for unchanged pdfs") {
         Statement s(db,
             "select file, last_modified from pdfs where file <> ?1;");
-        fs::path pdf = fs::canonical("./tests/pdfs/good1/CrashCourse_FR.PDF");
+        fs::path pdf = fs::canonical("./pdfs/good1/CrashCourse_FR.PDF");
         s.bind(pdf.native(), 1);
         std::set<std::tuple<std::string, sqlite3_int64>> unChangedBefore;
         for (auto it = s.begin(); it != s.end(); it++) {
@@ -177,13 +177,13 @@ TEST_CASE("database index1", "[database]") {
 }
 
 TEST_CASE("database index2", "[database]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     fs::remove(dbFile);
     Database db(dbFile);
     db.createDatabase();
 
     SECTION("don't recurse into directories") {
-        std::vector<std::string> dirs{ "./tests/pdfs/" };
+        std::vector<std::string> dirs{ "./pdfs/" };
 
         REQUIRE_NOTHROW(db.index(dirs, 0));
         
@@ -196,7 +196,7 @@ TEST_CASE("database index2", "[database]") {
     }
 
     SECTION("recurse one level deep into directories") {
-        std::vector<std::string> dirs{ "./tests/pdfs/" };
+        std::vector<std::string> dirs{ "./pdfs/" };
 
         REQUIRE_NOTHROW(db.index(dirs, 1));
         
@@ -206,10 +206,10 @@ TEST_CASE("database index2", "[database]") {
             dbFiles.insert(*(it.column<std::string>(0)));
 
         std::set<std::string> fsFiles;
-        fsFiles.insert(fs::canonical("./tests/pdfs/good1/CrashCourse_FR.PDF").
+        fsFiles.insert(fs::canonical("./pdfs/good1/CrashCourse_FR.PDF").
             native());
         fsFiles.insert(fs::canonical(
-            "./tests/pdfs/good1/TrueCrypt User Guide.pdf").native());
+            "./pdfs/good1/TrueCrypt User Guide.pdf").native());
 
         REQUIRE(std::equal(dbFiles.begin(), dbFiles.end(), fsFiles.begin()));
     }
@@ -218,11 +218,11 @@ TEST_CASE("database index2", "[database]") {
 }
 
 TEST_CASE("database update", "[database]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     fs::remove(dbFile);
     Database db(dbFile);
     db.createDatabase();
-    std::vector<std::string> dirs { "./tests/pdfs" };
+    std::vector<std::string> dirs { "./pdfs" };
     
     SECTION("updating non-modified pdfs doesn't do anything") {
         REQUIRE_NOTHROW(db.index(dirs, Options::RECURSE_INFINITELY));
@@ -248,8 +248,8 @@ TEST_CASE("database update", "[database]") {
     }
 
     SECTION("updating after removing a pdf deletes pdf from database") {
-        fs::path from("./tests/pdfs/good1/CrashCourse_FR.PDF");
-        fs::path to = fs::canonical("./tests/pdfs/good1/") / fs::path("temp.pdf");
+        fs::path from("./pdfs/good1/CrashCourse_FR.PDF");
+        fs::path to = fs::canonical("./pdfs/good1/") / fs::path("temp.pdf");
         fs::copy(from, to);
 
         REQUIRE_NOTHROW(db.index(dirs, Options::RECURSE_INFINITELY));
@@ -298,7 +298,7 @@ TEST_CASE("database update", "[database]") {
         // Pdf is updated. 
         Statement s(db,
             "select last_modified from pdfs where file = ?1;");
-        fs::path pdf = fs::canonical("./tests/pdfs/good1/CrashCourse_FR.PDF");
+        fs::path pdf = fs::canonical("./pdfs/good1/CrashCourse_FR.PDF");
         s.bind(pdf.native(), 1);
         time_t lastModifiedOld = 0;
         for (auto it = s.begin(); it != s.end(); it++)
@@ -332,10 +332,10 @@ TEST_CASE("database update", "[database]") {
 }
 
 TEST_CASE("database query1", "[database]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
-    std::vector<std::string> dirs{ "./tests/pdfs/" };
+    std::vector<std::string> dirs{ "./pdfs/" };
 
     REQUIRE_NOTHROW(db.index(dirs, Options::RECURSE_INFINITELY));
 
@@ -353,7 +353,7 @@ TEST_CASE("database query1", "[database]") {
 
     std::set<std::string> fsPdfs;
     boost::regex p("\\.pdf$", boost::regex::icase);
-    findFiles(std::inserter(fsPdfs, fsPdfs.begin()), "./tests/pdfs/good1", p);
+    findFiles(std::inserter(fsPdfs, fsPdfs.begin()), "./pdfs/good1", p);
 
     // Query returned pages of all indexed pdfs.
     REQUIRE(std::equal(dbPdfs.begin(), dbPdfs.end(), fsPdfs.begin()));
@@ -393,7 +393,7 @@ TEST_CASE("database query1", "[database]") {
 }
 
 TEST_CASE("database constraints", "[database]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     fs::remove(dbFile);
     Database db(dbFile);
     db.createDatabase();

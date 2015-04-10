@@ -9,7 +9,7 @@ namespace fs = boost::filesystem;
 using namespace Pdfsearch;
 
 TEST_CASE("statement constructor", "[statement]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -20,7 +20,7 @@ TEST_CASE("statement constructor", "[statement]") {
 }
 
 TEST_CASE("statement bind", "[statement]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -42,7 +42,7 @@ TEST_CASE("statement bind", "[statement]") {
 }
 
 TEST_CASE("statement step", "[statement]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -56,7 +56,7 @@ TEST_CASE("statement step", "[statement]") {
 }
 
 TEST_CASE("statement reset", "[statement]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 
@@ -73,7 +73,7 @@ TEST_CASE("statement reset", "[statement]") {
 }
 
 TEST_CASE("statement begin and end", "[statement]") {
-    std::string dbFile("./tests/testdb");
+    std::string dbFile("./testdb");
     Database db(dbFile);
     db.createDatabase();
 

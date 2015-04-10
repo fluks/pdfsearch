@@ -1,0 +1,7 @@
+Libraries needed to build this program are: poppler-cpp, sqlite3,
+boost::filesystem and boost::regex.
+
+./configure
+make
+make check
+make install
