@@ -1,0 +1,6 @@
+pdfsearch creates a database from pdfs in the file system. After that, the
+database can be used to search text from all the indexed pdfs.
+
+INSTALL
+
+See INSTALL.
