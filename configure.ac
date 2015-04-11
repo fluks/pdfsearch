@@ -2,7 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([pdfsearch++], [0.01], [fluks.github@gmail.com])
+AC_INIT([pdfsearch], [0.01], [https://github.com/fluks/pdfsearch/issues], [],\
+    [https://github.com/fluks/pdfsearch])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
