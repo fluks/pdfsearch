@@ -7,8 +7,6 @@ a.out
 t.sqlite
 plans
 src/*.d
-doc/html
-doc/man
 t.cpp
 t1.cpp
 t2.cpp

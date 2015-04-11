@@ -1,0 +1,306 @@
+.TH "Pdfsearch::Database" 3 "Sat Apr 11 2015" "pdfsearch" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Pdfsearch::Database \- 
+.PP
+A database class\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <database\&.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBstatement_key\fP { \fBIS_PDF_IN_DB\fP, \fBINSERT_PDF\fP, \fBINSERT_PAGE\fP, \fBDELETE_PAGES\fP, \fBUPDATE_PDF\fP, \fBGET_ALL_PDFS1\fP, \fBGET_ALL_PDFS2\fP, \fBDELETE_PDF\fP }"
+.br
+.RI "\fIKeys to stmt_map returned by private function initStatements(stmt_map&)\&. \fP"
+.ti -1c
+.RI "typedef std::map< enum 
+.br
+\fBstatement_key\fP, std::unique_ptr
+.br
+< \fBStatement\fP > > \fBstmt_map\fP"
+.br
+.RI "\fIReturn value of a private funtion initStatements(stmt_map&)\&. \fP"
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBDatabase\fP ()"
+.br
+.RI "\fIDefault constructor\&. \fP"
+.ti -1c
+.RI "\fBDatabase\fP (const std::string &file)"
+.br
+.RI "\fIConstruct instance and open database\&. \fP"
+.ti -1c
+.RI "\fBDatabase\fP (const \fBDatabase\fP &other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "\fBDatabase\fP & \fBoperator=\fP (const \fBDatabase\fP &other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "\fBDatabase\fP (\fBDatabase\fP &&other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "\fBDatabase\fP & \fBoperator=\fP (\fBDatabase\fP &&other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "\fB~Database\fP ()"
+.br
+.RI "\fIDestructor\&. \fP"
+.ti -1c
+.RI "void \fBopen\fP ()"
+.br
+.RI "\fIOpen database\&. \fP"
+.ti -1c
+.RI "void \fBopen\fP (const std::string &file)"
+.br
+.RI "\fIOpen database\&. \fP"
+.ti -1c
+.RI "void \fBclose\fP ()"
+.br
+.RI "\fIClose database\&. \fP"
+.ti -1c
+.RI "void \fBcreateDatabase\fP () const "
+.br
+.RI "\fICreate database\&. \fP"
+.ti -1c
+.RI "bool \fBdatabaseCreated\fP () const "
+.br
+.RI "\fICheck that database is created\&. \fP"
+.ti -1c
+.RI "void \fBvacuum\fP () const "
+.br
+.RI "\fIVacuum the database\&. \fP"
+.ti -1c
+.RI "void \fBupdate\fP () const "
+.br
+.RI "\fIUpdate the database\&. \fP"
+.ti -1c
+.RI "void \fBindex\fP (const std::vector< std::string > &directories, const int MAX_DEPTH) const "
+.br
+.RI "\fIIndex pdfs\&. \fP"
+.ti -1c
+.RI "std::vector< \fBQueryResult\fP > \fBquery\fP (const std::string &query, bool verbose, int matches) const "
+.br
+.RI "\fIFind text from pdfs\&. \fP"
+.in -1c
+.SS "Friends"
+
+.in +1c
+.ti -1c
+.RI "class \fBStatement\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A database class\&. 
+
+Example usage: 
+.PP
+.nf
+try {
+    Pdfsearch::Database db(file);
+    if (!db\&.databaseCreated())
+        db\&.createDatabase();
+
+    db\&.index(directories, recursionDepth);
+
+    auto results(db\&.query(text, verbose, matches));
+    // \&.\&.\&.
+}
+catch (const Pdfsearch::DatabaseError& e) {
+    // \&.\&.\&.
+
+.fi
+.PP
+ 
+.PP
+\fBNote:\fP
+.RS 4
+The class is non-copyable\&. 
+.RE
+.PP
+
+.SH "Member Typedef Documentation"
+.PP 
+.SS "typedef std::map<enum \fBstatement_key\fP, std::unique_ptr<\fBStatement\fP> > \fBPdfsearch::Database::stmt_map\fP"
+
+.PP
+Return value of a private funtion initStatements(stmt_map&)\&. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Pdfsearch::Database::Database ()\fC [inline]\fP"
+
+.PP
+Default constructor\&. 
+.SS "Pdfsearch::Database::Database (const std::string &file)"
+
+.PP
+Construct instance and open database\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfile\fP Filepath to database\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIA\fP \fBDatabaseError\fP if can't open database\&. 
+.RE
+.PP
+
+.SS "Pdfsearch::Database::Database (const \fBDatabase\fP &other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SS "Pdfsearch::Database::Database (\fBDatabase\fP &&other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SS "Pdfsearch::Database::~Database ()"
+
+.PP
+Destructor\&. Closes the database\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void Pdfsearch::Database::close ()"
+
+.PP
+Close database\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIA\fP \fBDatabaseError\fP if can't close database\&. 
+.RE
+.PP
+
+.SS "void Pdfsearch::Database::createDatabase () const"
+
+.PP
+Create database\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIA\fP \fBDatabaseError\fP if can't create database\&. 
+.RE
+.PP
+
+.SS "bool Pdfsearch::Database::databaseCreated () const"
+
+.PP
+Check that database is created\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+True if database exists, false otherwise\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIA\fP \fBDatabaseError\fP if can't query database\&. 
+.RE
+.PP
+
+.SS "void Pdfsearch::Database::index (const std::vector< std::string > &directories, const intMAX_DEPTH) const"
+
+.PP
+Index pdfs\&. Find pdfs on the filesystem and insert them to the database\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdirectories\fP Directories where to look for pdfs\&. 
+.br
+\fIMAX_DEPTH\fP A maximum depth to recurse in a directory\&. \fBOptions::RECURSE_INFINITELY\fP to recurse indefinitely, 0 to not to recurse at all\&. 
+.RE
+.PP
+
+.SS "void Pdfsearch::Database::open ()"
+
+.PP
+Open database\&. \fBDatabase\fP filepath needs to be initialized in the constructor already\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIA\fP \fBDatabaseError\fP if can't open database\&. 
+.RE
+.PP
+
+.SS "void Pdfsearch::Database::open (const std::string &file)"
+
+.PP
+Open database\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfile\fP Filepath to database\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIA\fP \fBDatabaseError\fP if can't open database\&. 
+.RE
+.PP
+
+.SS "\fBDatabase\fP& Pdfsearch::Database::operator= (const \fBDatabase\fP &other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SS "\fBDatabase\fP& Pdfsearch::Database::operator= (\fBDatabase\fP &&other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SS "std::vector< \fBPdfsearch::QueryResult\fP > Pdfsearch::Database::query (const std::string &query, boolverbose, intmatches) const"
+
+.PP
+Find text from pdfs\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquery\fP The phrase to search\&. 
+.br
+\fIverbose\fP If false, only QueryResult::file member is set in the return value, otherwise all members are set\&. 
+.br
+\fImatches\fP Limit the number of matches\&. \fBOptions::UNLIMITED_MATCHES\fP to return all matches\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Information about matching pages\&. 
+.RE
+.PP
+
+.SS "void Pdfsearch::Database::update () const"
+
+.PP
+Update the database\&. If a pdf isn't on the filesystem anymore, it's removed from the database\&. If pdf is newer on the filesystem than in the database, pdf in the database is updated\&. 
+.SS "void Pdfsearch::Database::vacuum () const"
+
+.PP
+Vacuum the database\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIA\fP \fBDatabaseError\fP if can't vacuum the database\&. 
+.RE
+.PP
+\fBSee Also:\fP
+.RS 4
+http://www.sqlite.org/lang_vacuum.html 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for pdfsearch from the source code\&.

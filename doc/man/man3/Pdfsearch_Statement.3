@@ -1,0 +1,200 @@
+.TH "Pdfsearch::Statement" 3 "Sat Apr 11 2015" "pdfsearch" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Pdfsearch::Statement \- 
+.PP
+A class to prepare an SQL statement\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <statement\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBStatement\fP (const \fBDatabase\fP &db, const std::string &sql)"
+.br
+.RI "\fIConstractor\&. \fP"
+.ti -1c
+.RI "\fBStatement\fP (const \fBStatement\fP &statement)=delete"
+.br
+.RI "\fICopy constractor deleted, always pass by reference\&. \fP"
+.ti -1c
+.RI "\fBStatement\fP & \fBoperator=\fP (const \fBStatement\fP &statement)=delete"
+.br
+.RI "\fICopy assignment operator deleted, always pass by reference\&. \fP"
+.ti -1c
+.RI "\fBStatement\fP (\fBStatement\fP &&statement)=delete"
+.br
+.RI "\fIMove constractor deleted, always pass by reference\&. \fP"
+.ti -1c
+.RI "\fBStatement\fP & \fBoperator=\fP (\fBStatement\fP &&statement)=delete"
+.br
+.RI "\fIMove assignment operator deleted, always pass by reference\&. \fP"
+.ti -1c
+.RI "template<typename T > void \fBbind\fP (T value, int column) const "
+.br
+.RI "\fIBind a value to a parameter\&. \fP"
+.ti -1c
+.RI "\fBResultRowIterator\fP \fBbegin\fP () const "
+.br
+.RI "\fIGet iterator to results\&. \fP"
+.ti -1c
+.RI "\fBResultRowIterator\fP \fBend\fP () const "
+.br
+.RI "\fIGet the end of results\&. \fP"
+.ti -1c
+.RI "void \fBstep\fP () const "
+.br
+.RI "\fIEvaluate the statement\&. \fP"
+.ti -1c
+.RI "void \fBreset\fP () const "
+.br
+.RI "\fIReset the statement\&. \fP"
+.ti -1c
+.RI "template<> void \fBbind\fP (int value, int column) const "
+.br
+.ti -1c
+.RI "template<> void \fBbind\fP (sqlite3_int64 value, int column) const "
+.br
+.ti -1c
+.RI "template<> void \fBbind\fP (double value, int column) const "
+.br
+.ti -1c
+.RI "template<> void \fBbind\fP (void *, int column) const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A class to prepare an SQL statement\&. 
+
+
+.PP
+\fBNote:\fP
+.RS 4
+The class in non-copyable\&. 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Pdfsearch::Statement::Statement (const \fBDatabase\fP &db, const std::string &sql)"
+
+.PP
+Constractor\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdb\fP \fBDatabase\fP handle\&. 
+.br
+\fIsql\fP SQL command to prepare\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if fails to prepare statement\&. 
+.RE
+.PP
+
+.SS "Pdfsearch::Statement::Statement (const \fBStatement\fP &statement)\fC [delete]\fP"
+
+.PP
+Copy constractor deleted, always pass by reference\&. 
+.SS "Pdfsearch::Statement::Statement (\fBStatement\fP &&statement)\fC [delete]\fP"
+
+.PP
+Move constractor deleted, always pass by reference\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "\fBResultRowIterator\fP Pdfsearch::Statement::begin () const\fC [inline]\fP"
+
+.PP
+Get iterator to results\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+\fBResultRowIterator\fP 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if fails to get first row\&. 
+.RE
+.PP
+
+.SS "template<typename T > void Pdfsearch::Statement::bind (Tvalue, intcolumn) const"
+
+.PP
+Bind a value to a parameter\&. Example: 
+.PP
+.nf
+stmt\&.bind(10, 1);             // T is int\&.
+stmt\&.bind<void*>(nullptr, 2); // void* needs template argument\&.
+stmt\&.bind(3\&.4, 3);            // T is double\&.
+stmt\&.bind("bla", 4);          // T is std::string\&.
+
+.fi
+.PP
+ 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP A value to bind\&. Can be of type an int, sqlite_int64, double, std::string or void* i\&.e\&. NULL\&. 
+.br
+\fIcolumn\fP Number of parameter to bind a value to\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if can't bind value\&. 
+.RE
+.PP
+
+.SS "\fBResultRowIterator\fP Pdfsearch::Statement::end () const\fC [inline]\fP"
+
+.PP
+Get the end of results\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+\fBResultRowIterator\fP 
+.RE
+.PP
+
+.SS "\fBStatement\fP& Pdfsearch::Statement::operator= (const \fBStatement\fP &statement)\fC [delete]\fP"
+
+.PP
+Copy assignment operator deleted, always pass by reference\&. 
+.SS "\fBStatement\fP& Pdfsearch::Statement::operator= (\fBStatement\fP &&statement)\fC [delete]\fP"
+
+.PP
+Move assignment operator deleted, always pass by reference\&. 
+.SS "void Pdfsearch::Statement::reset () const"
+
+.PP
+Reset the statement\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if last call to \fBstep()\fP failed\&. 
+.RE
+.PP
+
+.SS "void Pdfsearch::Statement::step () const"
+
+.PP
+Evaluate the statement\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if evaluating the statement fails\&. 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for pdfsearch from the source code\&.

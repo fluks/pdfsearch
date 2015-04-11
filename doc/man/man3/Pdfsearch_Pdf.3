@@ -1,0 +1,173 @@
+.TH "Pdfsearch::Pdf" 3 "Sat Apr 11 2015" "pdfsearch" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Pdfsearch::Pdf \- 
+.PP
+A class for a PDF document\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <pdf\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBPdf\fP (const std::string &file)"
+.br
+.RI "\fIConstructor\&. \fP"
+.ti -1c
+.RI "\fBPdf\fP (const \fBPdf\fP &other)=delete"
+.br
+.RI "\fINo copying\&. \fP"
+.ti -1c
+.RI "\fBPdf\fP & \fBoperator=\fP (const \fBPdf\fP &other)=delete"
+.br
+.RI "\fINo copying\&. \fP"
+.ti -1c
+.RI "\fBPdf\fP (\fBPdf\fP &&other)=delete"
+.br
+.RI "\fINo copying\&. \fP"
+.ti -1c
+.RI "\fBPdf\fP & \fBoperator=\fP (\fBPdf\fP &&other)=delete"
+.br
+.RI "\fINo copying\&. \fP"
+.ti -1c
+.RI "std::unique_ptr< std::string > \fBgetPage\fP (int page) const "
+.br
+.RI "\fIGet page text\&. \fP"
+.ti -1c
+.RI "int \fBnumberOfPages\fP () const "
+.br
+.RI "\fIGet number of pages in a pdf\&. \fP"
+.ti -1c
+.RI "std::string \fBgetFile\fP () const "
+.br
+.RI "\fI\fBPdf\fP filename getter\&. \fP"
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static bool \fBfilenameEndsToPdf\fP (const std::string &file)"
+.br
+.RI "\fICheck whether filename ends to '\&.pdf' case-insensitively\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+A class for a PDF document\&. 
+
+
+.PP
+\fBNote:\fP
+.RS 4
+The class is non-copyable\&. 
+.RE
+.PP
+\fBBug\fP
+.RS 4
+poppler::page leaks\&. Am I doing something wrong or is there a bug in poppler? Currently, I'm using an old version of poppler, maybe updating fixes this\&. Update: poppler::document leaks with new version of poppler? poppler::page doesn't seem to leak\&. 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Pdfsearch::Pdf::Pdf (const std::string &file)\fC [inline]\fP"
+
+.PP
+Constructor\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfile\fP \fBPdf\fP filename\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIstd::runtime_error\fP if can't load pdf\&. 
+.RE
+.PP
+
+.SS "Pdfsearch::Pdf::Pdf (const \fBPdf\fP &other)\fC [delete]\fP"
+
+.PP
+No copying\&. 
+.SS "Pdfsearch::Pdf::Pdf (\fBPdf\fP &&other)\fC [delete]\fP"
+
+.PP
+No copying\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "bool Pdfsearch::Pdf::filenameEndsToPdf (const std::string &file)\fC [static]\fP"
+
+.PP
+Check whether filename ends to '\&.pdf' case-insensitively\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfile\fP Filename\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIstd::runtime_error\fP if regex takes too much resources (very unlikely, in practice this can be ignored)\&. 
+.RE
+.PP
+
+.SS "std::string Pdfsearch::Pdf::getFile () const\fC [inline]\fP"
+
+.PP
+\fBPdf\fP filename getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+Filename of the pdf\&. 
+.RE
+.PP
+
+.SS "std::unique_ptr< std::string > Pdfsearch::Pdf::getPage (intpage) const"
+
+.PP
+Get page text\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpage\fP Page number, [0, \fBnumberOfPages()\fP[\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A pointer to the text in a page\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIstd::invalid_argument\fP if invalid page parameter given or std::runtime_error if can't create a page\&. 
+.RE
+.PP
+
+.SS "int Pdfsearch::Pdf::numberOfPages () const\fC [inline]\fP"
+
+.PP
+Get number of pages in a pdf\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+Number of pages\&. 
+.RE
+.PP
+
+.SS "\fBPdf\fP& Pdfsearch::Pdf::operator= (const \fBPdf\fP &other)\fC [delete]\fP"
+
+.PP
+No copying\&. 
+.SS "\fBPdf\fP& Pdfsearch::Pdf::operator= (\fBPdf\fP &&other)\fC [delete]\fP"
+
+.PP
+No copying\&. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for pdfsearch from the source code\&.

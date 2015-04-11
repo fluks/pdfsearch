@@ -1,0 +1,73 @@
+.TH "Pdfsearch::DatabaseError" 3 "Sat Apr 11 2015" "pdfsearch" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Pdfsearch::DatabaseError \- 
+.PP
+A class for database exceptions\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <database_error\&.h>\fP
+.PP
+Inherits runtime_error\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBDatabaseError\fP (int code, const std::string &message)"
+.br
+.ti -1c
+.RI "\fBDatabaseError\fP (const std::string &message)"
+.br
+.ti -1c
+.RI "int \fBgetCode\fP () const "
+.br
+.RI "\fIGet an SQLite error code\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+A class for database exceptions\&. 
+
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Pdfsearch::DatabaseError::DatabaseError (intcode, const std::string &message)\fC [inline]\fP"
+
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcode\fP SQLite error code\&. 
+.br
+\fImessage\fP \fBDatabaseError\fP message\&. 
+.RE
+.PP
+
+.SS "Pdfsearch::DatabaseError::DatabaseError (const std::string &message)\fC [inline]\fP"
+
+.PP
+\fBParameters:\fP
+.RS 4
+\fImessage\fP \fBDatabaseError\fP message\&. 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "int Pdfsearch::DatabaseError::getCode () const\fC [inline]\fP"
+
+.PP
+Get an SQLite error code\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+An SQLite error code\&. 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for pdfsearch from the source code\&.

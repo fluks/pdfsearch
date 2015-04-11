@@ -1,0 +1,363 @@
+.TH "Pdfsearch::Options" 3 "Sat Apr 11 2015" "pdfsearch" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Pdfsearch::Options \- 
+.PP
+Class to read command line options\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <options\&.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum { \fBUNLIMITED_MATCHES\fP = 0, \fBRECURSE_INFINITELY\fP = -1 }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBOptions\fP (int argc, char **argv)"
+.br
+.RI "\fICreate a new \fBOptions\fP instance\&. \fP"
+.ti -1c
+.RI "\fB~Options\fP ()"
+.br
+.RI "\fIDestructor\&. \fP"
+.ti -1c
+.RI "\fBOptions\fP (const \fBOptions\fP &other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "\fBOptions\fP & \fBoperator=\fP (const \fBOptions\fP &other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "\fBOptions\fP (\fBOptions\fP &&other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "\fBOptions\fP & \fBoperator=\fP (\fBOptions\fP &&other)=delete"
+.br
+.RI "\fINon-copyable\&. \fP"
+.ti -1c
+.RI "void \fBgetopt\fP ()"
+.br
+.RI "\fIParse commandline options\&. \fP"
+.ti -1c
+.RI "void \fBvalidate\fP () const "
+.br
+.RI "\fIValidate options\&. \fP"
+.ti -1c
+.RI "std::string \fBgetConfig\fP () const "
+.br
+.RI "\fIConfig file option getter\&. \fP"
+.ti -1c
+.RI "std::string \fBgetDatabase\fP () const "
+.br
+.RI "\fIDatabase file option getter\&. \fP"
+.ti -1c
+.RI "bool \fBgetHelp\fP () const "
+.br
+.RI "\fIHelp option getter\&. \fP"
+.ti -1c
+.RI "std::vector< std::string > \fBgetDirectories\fP () const "
+.br
+.RI "\fIGet directories for index\&. \fP"
+.ti -1c
+.RI "bool \fBgetIndex\fP () const "
+.br
+.RI "\fIIndex option getter\&. \fP"
+.ti -1c
+.RI "int \fBgetMatches\fP () const "
+.br
+.RI "\fIMathes option getter\&. \fP"
+.ti -1c
+.RI "std::string \fBgetQuery\fP () const "
+.br
+.RI "\fIQuery option getter\&. \fP"
+.ti -1c
+.RI "int \fBgetRecursion\fP () const "
+.br
+.RI "\fIRecursion option getter\&. \fP"
+.ti -1c
+.RI "bool \fBgetUpdate\fP () const "
+.br
+.RI "\fIUpdate option getter\&. \fP"
+.ti -1c
+.RI "bool \fBgetVacuum\fP () const "
+.br
+.RI "\fIVacuum option getter\&. \fP"
+.ti -1c
+.RI "bool \fBgetVerbose\fP () const "
+.br
+.RI "\fIVerbosity option getter\&. \fP"
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static void \fBreset\fP ()"
+.br
+.RI "\fIReset state for parsing command line options again\&. \fP"
+.ti -1c
+.RI "static void \fBprintHelp\fP ()"
+.br
+.RI "\fIPrint help\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Class to read command line options\&. 
+
+Example usage: 
+.PP
+.nf
+Pdfsearch::Options o(argc, argv);
+try {
+    o\&.getopt();
+    o\&.validate();
+    // Use getters\&.
+    // \&.\&.\&.
+
+.fi
+.PP
+ 
+.PP
+\fBNote:\fP
+.RS 4
+The class is non-copyable\&. 
+.RE
+.PP
+
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "anonymous enum"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIUNLIMITED_MATCHES \fP\fP
+Return all the matches\&. 
+.TP
+\fB\fIRECURSE_INFINITELY \fP\fP
+Recurse infinitely\&. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Pdfsearch::Options::Options (intargc, char **argv)"
+
+.PP
+Create a new \fBOptions\fP instance\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIargc\fP Number of command line arguments\&. 
+.br
+\fIargv\fP Command line arguments\&. 
+.PP
+.nf
+ Sets defaults:
+    config: \fBConfig::CONFIG_FILE\fP
+    database: \fBConfig::DATABASE_FILE\fP
+    directories: current directory('\&.')
+    help: false
+    index: false
+    matches: \fBOptions::UNLIMITED_MATCHES\fP
+    query: empty string
+    recursion: \fBOptions::RECURSE_INFINITELY\fP
+    update: false
+    vacuum: false
+    verbose: false
+.fi
+.PP
+ 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+Copies argv\&. 
+.RE
+.PP
+
+.SS "Pdfsearch::Options::~Options ()"
+
+.PP
+Destructor\&. Frees memory allocated for argv\&. 
+.SS "Pdfsearch::Options::Options (const \fBOptions\fP &other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SS "Pdfsearch::Options::Options (\fBOptions\fP &&other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "std::string Pdfsearch::Options::getConfig () const\fC [inline]\fP"
+
+.PP
+Config file option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+A path to config file\&. 
+.RE
+.PP
+
+.SS "std::string Pdfsearch::Options::getDatabase () const\fC [inline]\fP"
+
+.PP
+Database file option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+A path to database file\&. 
+.RE
+.PP
+
+.SS "std::vector<std::string> Pdfsearch::Options::getDirectories () const\fC [inline]\fP"
+
+.PP
+Get directories for index\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+Directories to search pdfs from\&. 
+.RE
+.PP
+
+.SS "bool Pdfsearch::Options::getHelp () const\fC [inline]\fP"
+
+.PP
+Help option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+True if help option was given as argument, false otherwise\&. 
+.RE
+.PP
+
+.SS "bool Pdfsearch::Options::getIndex () const\fC [inline]\fP"
+
+.PP
+Index option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+True if index option was given as argument, false otherwise\&. 
+.RE
+.PP
+
+.SS "int Pdfsearch::Options::getMatches () const\fC [inline]\fP"
+
+.PP
+Mathes option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+\fBOptions::UNLIMITED_MATCHES\fP to return all matches\&. 
+.RE
+.PP
+
+.SS "void Pdfsearch::Options::getopt ()"
+
+.PP
+Parse commandline options\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIstd::ios_base::failure\fP if fails to read config, std::runtime_error on integer overflow or std::invalid_argument on invalid command line argument\&. 
+.RE
+.PP
+
+.SS "std::string Pdfsearch::Options::getQuery () const\fC [inline]\fP"
+
+.PP
+Query option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "int Pdfsearch::Options::getRecursion () const\fC [inline]\fP"
+
+.PP
+Recursion option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "bool Pdfsearch::Options::getUpdate () const\fC [inline]\fP"
+
+.PP
+Update option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+True if update option was given as argument, false otherwise\&. 
+.RE
+.PP
+
+.SS "bool Pdfsearch::Options::getVacuum () const\fC [inline]\fP"
+
+.PP
+Vacuum option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+True if vacuum option was given as argument, false otherwise\&. 
+.RE
+.PP
+
+.SS "bool Pdfsearch::Options::getVerbose () const\fC [inline]\fP"
+
+.PP
+Verbosity option getter\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+True if verbose option was given as argument, false otherwise\&. 
+.RE
+.PP
+
+.SS "\fBOptions\fP& Pdfsearch::Options::operator= (const \fBOptions\fP &other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SS "\fBOptions\fP& Pdfsearch::Options::operator= (\fBOptions\fP &&other)\fC [delete]\fP"
+
+.PP
+Non-copyable\&. 
+.SS "void Pdfsearch::Options::printHelp ()\fC [static]\fP"
+
+.PP
+Print help\&. 
+.SS "void Pdfsearch::Options::reset ()\fC [static]\fP"
+
+.PP
+Reset state for parsing command line options again\&. If you want to parse command line options again, you need to either let the previous object call its destructor or call this function\&. Failure to comply may lead to segfault\&. 
+.SS "void Pdfsearch::Options::validate () const"
+
+.PP
+Validate options\&. Check that mutually exclusive options are not given, either index, query, update or vacuum is given and matches < UNLIMITED_MATCHES\&. Other kind of option validation happens when option is used\&. 
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIstd::invalid_argument\fP if there's an invalid option\&. 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for pdfsearch from the source code\&.

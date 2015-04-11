@@ -1,0 +1,55 @@
+.TH "Pdfsearch::QueryResult" 3 "Sat Apr 11 2015" "pdfsearch" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Pdfsearch::QueryResult \- 
+.PP
+Return type for \fBDatabase::query(const std::string&, bool, int) const\fP\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <database\&.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "std::string \fBfile\fP"
+.br
+.ti -1c
+.RI "std::string \fBchunk\fP"
+.br
+.RI "\fISurrounding string of a match\&. \fP"
+.ti -1c
+.RI "int \fBpage\fP"
+.br
+.RI "\fIPage number of a match\&. \fP"
+.ti -1c
+.RI "int \fBpages\fP"
+.br
+.RI "\fINumber of pages in matching pdf\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+Return type for \fBDatabase::query(const std::string&, bool, int) const\fP\&. 
+
+
+.SH "Field Documentation"
+.PP 
+.SS "std::string Pdfsearch::QueryResult::chunk"
+
+.PP
+Surrounding string of a match\&. 
+.SS "int Pdfsearch::QueryResult::page"
+
+.PP
+Page number of a match\&. 
+.SS "int Pdfsearch::QueryResult::pages"
+
+.PP
+Number of pages in matching pdf\&. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for pdfsearch from the source code\&.

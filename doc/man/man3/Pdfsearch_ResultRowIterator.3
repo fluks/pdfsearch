@@ -1,0 +1,233 @@
+.TH "Pdfsearch::ResultRowIterator" 3 "Sat Apr 11 2015" "pdfsearch" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Pdfsearch::ResultRowIterator \- 
+.PP
+A class for a resultset of a SELECT SQL query\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <resultrowiterator\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBResultRowIterator\fP & \fBoperator++\fP ()"
+.br
+.RI "\fIGet the next row\&. \fP"
+.ti -1c
+.RI "\fBResultRowIterator\fP \fBoperator++\fP (int)"
+.br
+.RI "\fIGet the next row\&. \fP"
+.ti -1c
+.RI "bool \fBoperator==\fP (const \fBResultRowIterator\fP &rhs) const "
+.br
+.RI "\fIEquality operator\&. \fP"
+.ti -1c
+.RI "bool \fBoperator!=\fP (const \fBResultRowIterator\fP &rhs) const "
+.br
+.RI "\fIUnequality operator\&. \fP"
+.ti -1c
+.RI "template<typename T > std::unique_ptr< T > \fBcolumn\fP (int column)"
+.br
+.RI "\fIGet value of a column in resultset\&. \fP"
+.ti -1c
+.RI "sqlite3_int64 \fBgetRow\fP () const "
+.br
+.RI "\fIGet current row number\&. \fP"
+.ti -1c
+.RI "int \fBgetColumns\fP () const "
+.br
+.RI "\fIGet number of columns in the current row\&. \fP"
+.ti -1c
+.RI "template<> std::unique_ptr< int > \fBcolumn\fP (int column)"
+.br
+.ti -1c
+.RI "template<> std::unique_ptr< sqlite3_int64 > \fBcolumn\fP (int column)"
+.br
+.ti -1c
+.RI "template<> std::unique_ptr< double > \fBcolumn\fP (int column)"
+.br
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static \fBResultRowIterator\fP \fBbegin\fP (std::shared_ptr< sqlite3_stmt > statement)"
+.br
+.RI "\fIGet the iterator to resultset\&. \fP"
+.ti -1c
+.RI "static \fBResultRowIterator\fP \fBend\fP (std::shared_ptr< sqlite3_stmt > statement)"
+.br
+.RI "\fIThe end of the resultset\&. \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+A class for a resultset of a SELECT SQL query\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "static \fBResultRowIterator\fP Pdfsearch::ResultRowIterator::begin (std::shared_ptr< sqlite3_stmt >statement)\fC [inline]\fP, \fC [static]\fP"
+
+.PP
+Get the iterator to resultset\&. The first row is ready if there is such\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstatement\fP Prepared statement\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Resultset\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if step to next row fails\&. 
+.RE
+.PP
+
+.SS "template<typename T > std::unique_ptr<T> Pdfsearch::ResultRowIterator::column (intcolumn)"
+
+.PP
+Get value of a column in resultset\&. Valid generic types are int, sqlite3_int64, double and std::string\&. Example: 
+.PP
+.nf
+* std::unique_ptr<int> pages(it\&.column<int>(0));
+* std::unique_ptr<std::string> pages = std::move(it\&.column<std::string>(0));
+* 
+
+.fi
+.PP
+ 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcolumn\fP Column index\&. 0 <= column < number of columns\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Value of a column in resultset as an unique_ptr\&. Can be nullptr if database column is nullable\&. In that case user has to check for it before use\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if there is no row ready or if index is < 0 or >= number of columns in resultset or if generic type is not the same as column's type\&. 
+.RE
+.PP
+
+.SS "static \fBResultRowIterator\fP Pdfsearch::ResultRowIterator::end (std::shared_ptr< sqlite3_stmt >statement)\fC [inline]\fP, \fC [static]\fP"
+
+.PP
+The end of the resultset\&. Used to check is there more results\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstatement\fP Prepared statement\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+\fBResultRowIterator\fP with no more results\&. 
+.RE
+.PP
+
+.SS "int Pdfsearch::ResultRowIterator::getColumns () const\fC [inline]\fP"
+
+.PP
+Get number of columns in the current row\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+Number of columns in the current row\&. 
+.RE
+.PP
+
+.SS "sqlite3_int64 Pdfsearch::ResultRowIterator::getRow () const\fC [inline]\fP"
+
+.PP
+Get current row number\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+Current row number\&. 
+.RE
+.PP
+
+.SS "bool Pdfsearch::ResultRowIterator::operator!= (const \fBResultRowIterator\fP &rhs) const\fC [inline]\fP"
+
+.PP
+Unequality operator\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIrhs\fP Other result\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+False if resultsets are on the same row, true otherwise\&. 
+.RE
+.PP
+
+.SS "\fBResultRowIterator\fP& Pdfsearch::ResultRowIterator::operator++ ()\fC [inline]\fP"
+
+.PP
+Get the next row\&. Prefix ++ operator\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+This \fBResultRowIterator\fP\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if step to next row fails\&. 
+.RE
+.PP
+
+.SS "\fBResultRowIterator\fP Pdfsearch::ResultRowIterator::operator++ (int)\fC [inline]\fP"
+
+.PP
+Get the next row\&. Postfix ++ operator\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+Copy of this \fBResultRowIterator\fP\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBDatabaseError\fP\fP if step to next row fails\&. 
+.RE
+.PP
+
+.SS "bool Pdfsearch::ResultRowIterator::operator== (const \fBResultRowIterator\fP &rhs) const\fC [inline]\fP"
+
+.PP
+Equality operator\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIrhs\fP Other result\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True if resultsets are on the same row, false otherwise\&. 
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fIif\fP resultsets are for different statements\&. 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for pdfsearch from the source code\&.
