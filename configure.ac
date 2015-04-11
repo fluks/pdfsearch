@@ -43,4 +43,14 @@ AC_CONFIG_FILES([Makefile \
                 src/Makefile \
                 tests/Makefile \
                 doc/Makefile])
+
+AS_MKDIR_P(["${HOME}/.${PACKAGE_NAME}"])
+# Point default values to user's $HOME.
+AC_CONFIG_COMMANDS_POST([sed -i \
+    -e 's%\(CONFIG_FILE =\).*%\1 "'"${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"'";%' \
+    -e 's%\(DATABASE_FILE =\).*%\1 "'"${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.sqlite"'";%' \
+         "${srcdir}"/src/config.h])
+# Create empty config, fails if not found.
+AC_CONFIG_COMMANDS_POST([touch "${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"])
+
 AC_OUTPUT

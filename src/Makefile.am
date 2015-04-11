@@ -13,4 +13,3 @@ pdfsearch_SOURCES = main.cpp \
 					resultrowiterator.h \
 					statement.cpp \
 					statement.h
-EXTRA_DIST = dummy.conf
