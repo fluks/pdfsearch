@@ -8,23 +8,21 @@ AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG_CPLUSPLUS
+AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lboost_filesystem':
-AC_CHECK_LIB([boost_filesystem], [main])
-# FIXME: Replace `main' with a function in `-lboost_regex':
-AC_CHECK_LIB([boost_regex], [main])
-# FIXME: Replace `main' with a function in `-lboost_system':
-AC_CHECK_LIB([boost_system], [main])
-# FIXME: Replace `main' with a function in `-lpoppler-cpp':
-AC_CHECK_LIB([poppler-cpp], [main])
-# FIXME: Replace `main' with a function in `-lsqlite3':
-AC_CHECK_LIB([sqlite3], [main])
+# Disable assertions with --disable-assert.
+AC_HEADER_ASSERT
+
+AX_BOOST_BASE
+AX_BOOST_FILESYSTEM
+AX_BOOST_SYSTEM
+AX_BOOST_REGEX
+LIBS="$BOOST_FILESYSTEM_LIB $BOOST_SYSTEM_LIB $BOOST_REGEX_LIB"
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdint.h stdlib.h sys/time.h unistd.h])
@@ -53,5 +51,15 @@ AC_CONFIG_COMMANDS_POST([sed -i \
          "${srcdir}"/src/config.h])
 # Create empty config, fails if not found.
 AC_CONFIG_COMMANDS_POST([touch "${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"])
+
+PKG_CHECK_MODULES([POPPLER], [poppler], , AC_MSG_ERROR([poppler not found], ))
+PKG_CHECK_MODULES([POPPLERCPP], [poppler-cpp], , AC_MSG_ERROR([poppler-cpp not found], ))
+PKG_CHECK_MODULES([SQLITE], [sqlite3], , AC_MSG_ERROR([sqlite not found], ))
+
+LIBS="$LIBS $POPPLER_LIBS $POPPLERCPP_LIBS $SQLITE_LIBS"
+AC_SUBST([AM_CPPFLAGS], ['$(POPPLER_CFLAGS) $(POPPLERCPP_CFLAGS) $(SQLITE_CFLAGS)'])
+
+#AC_DEFINE_UNQUOTED([CONFIG_FILE], ["${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"], [Configuration file.])
+#AC_DEFINE_UNQUOTED([DATABASE_FILE], ["${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.sqlite"], [Database file.])
 
 AC_OUTPUT

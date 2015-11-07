@@ -15,8 +15,7 @@ catch_SOURCES = 00-options.cpp \
 catch_LDADD = $(top_builddir)/src/options.o \
 				$(top_builddir)/src/database.o \
 				$(top_builddir)/src/pdf.o \
-				$(top_builddir)/src/statement.o \
-				$(LDADD)
+				$(top_builddir)/src/statement.o
 EXTRA_DIST = existing_testdb.sqlite \
 			 invalid.conf \
 			 test1.conf \

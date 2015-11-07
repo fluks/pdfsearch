@@ -16,7 +16,4 @@ generate-man:
 	@pod2man --release --center 'General Commands Manual' \
 		$(top_srcdir)/doc/pdfsearch.pod $(top_srcdir)/doc/pdfsearch.1
 
-link-new-poppler:
-	make LDFLAGS='-L/usr/local/lib/ -Wl,--rpath,/usr/local/lib'
-
-.PHONY: generate-doc generate-man cppcheck link-new-poppler
+.PHONY: generate-doc generate-man cppcheck
