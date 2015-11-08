@@ -4,7 +4,6 @@ bin_PROGRAMS = pdfsearch
 pdfsearch_SOURCES = main.cpp \
 					options.cpp \
 					options.h \
-					config.h \
 					database.cpp \
 					database.h \
 					database_error.h \

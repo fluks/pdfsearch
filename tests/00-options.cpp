@@ -1,16 +1,16 @@
 #include <cstring>
 #include <limits>
 #include <sstream>
-#include "options.h"
 #include "config.h"
+#include "options.h"
 #include "catch.hpp"
 
 TEST_CASE("default options", "[options]") {
     const char* argv[] = { "" };
     Pdfsearch::Options o(1, const_cast<char**>(argv));
 
-    REQUIRE(o.getConfig() == Pdfsearch::Config::CONFIG_FILE);
-    REQUIRE(o.getDatabase() == Pdfsearch::Config::DATABASE_FILE);
+    REQUIRE(o.getConfig() == CONFIG_FILE);
+    REQUIRE(o.getDatabase() == DATABASE_FILE);
     REQUIRE(o.getDirectories().at(0) == ".");
     REQUIRE(!o.getHelp());
     REQUIRE(!o.getIndex());

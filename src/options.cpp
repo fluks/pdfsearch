@@ -6,13 +6,14 @@
 #include <cstring>
 #include <new>
 #include <boost/regex.hpp>
+#include "config.h"
 #include "options.h"
 
 Pdfsearch::Options::Options(int argc, char** argv) :
         argc(argc),
         argv(nullptr),
-        config(Config::CONFIG_FILE),
-        database(Config::DATABASE_FILE),
+        config(CONFIG_FILE),
+        database(DATABASE_FILE),
         directories({ "." }),
         help(false),
         index(false),
@@ -247,10 +248,10 @@ Pdfsearch::Options::printHelp() {
     using namespace std;
     ostringstream help;
     help <<
-        Config::PROGRAM_NAME << " version " << Config::VERSION    << endl <<
-        "Usage: " << Config::PROGRAM_NAME << " [OPTIONS] ..."     << endl <<
-        "       " << Config::PROGRAM_NAME << " -q <STRING>"       << endl <<
-        "       " << Config::PROGRAM_NAME << " -i<DIR>,..."       << endl <<
+        PACKAGE << " version " << VERSION                         << endl <<
+        "Usage: " << PACKAGE << " [OPTIONS] ..."                  << endl <<
+        "       " << PACKAGE << " -q <STRING>"                    << endl <<
+        "       " << PACKAGE << " -i<DIR>,..."                    << endl <<
         "   -a, --vacuum              vacuum database"            << endl <<
         "   -c, --config=FILE         configuration file"         << endl <<
         "   -d, --database=FILE       database file"              << endl <<

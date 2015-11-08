@@ -43,23 +43,24 @@ AC_CONFIG_FILES([Makefile \
                 tests/Makefile \
                 doc/Makefile])
 
+AC_DEFINE_UNQUOTED([CONFIG_FILE],
+    ["${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"], [Configuration file.])
+AC_DEFINE_UNQUOTED([DATABASE_FILE],
+    ["${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.sqlite"], [Database file.])
+
 AS_MKDIR_P(["${HOME}/.${PACKAGE_NAME}"])
-# Point default values to user's $HOME.
-AC_CONFIG_COMMANDS_POST([sed -i \
-    -e 's%\(CONFIG_FILE =\).*%\1 "'"${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"'";%' \
-    -e 's%\(DATABASE_FILE =\).*%\1 "'"${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.sqlite"'";%' \
-         "${srcdir}"/src/config.h])
 # Create empty config, fails if not found.
 AC_CONFIG_COMMANDS_POST([touch "${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"])
 
-PKG_CHECK_MODULES([POPPLER], [poppler], , AC_MSG_ERROR([poppler not found], ))
-PKG_CHECK_MODULES([POPPLERCPP], [poppler-cpp], , AC_MSG_ERROR([poppler-cpp not found], ))
-PKG_CHECK_MODULES([SQLITE], [sqlite3], , AC_MSG_ERROR([sqlite not found], ))
+PKG_CHECK_MODULES([POPPLER], [poppler], ,
+    AC_MSG_ERROR([poppler not found], ))
+PKG_CHECK_MODULES([POPPLERCPP], [poppler-cpp], ,
+    AC_MSG_ERROR([poppler-cpp not found], ))
+PKG_CHECK_MODULES([SQLITE], [sqlite3], ,
+    AC_MSG_ERROR([sqlite not found], ))
 
 LIBS="$LIBS $POPPLER_LIBS $POPPLERCPP_LIBS $SQLITE_LIBS"
-AC_SUBST([AM_CPPFLAGS], ['$(POPPLER_CFLAGS) $(POPPLERCPP_CFLAGS) $(SQLITE_CFLAGS)'])
-
-#AC_DEFINE_UNQUOTED([CONFIG_FILE], ["${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.conf"], [Configuration file.])
-#AC_DEFINE_UNQUOTED([DATABASE_FILE], ["${HOME}/.${PACKAGE_NAME}/${PACKAGE_NAME}.sqlite"], [Database file.])
+AC_SUBST([AM_CPPFLAGS],
+    ['$(POPPLER_CFLAGS) $(POPPLERCPP_CFLAGS) $(SQLITE_CFLAGS)'])
 
 AC_OUTPUT

@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-#include "config.h"
 
 namespace Pdfsearch {
     /** Class to read command line options.
