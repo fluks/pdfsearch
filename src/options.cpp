@@ -153,7 +153,7 @@ Pdfsearch::Options::getopt() {
 
 void
 Pdfsearch::Options::validate() const {
-    if (!index && query.empty() && !vacuum) {
+    if (!index && query.empty() && !vacuum && !update) {
         throw std::invalid_argument("either index, query, update or vacuum "
             "option must be selected");
     }

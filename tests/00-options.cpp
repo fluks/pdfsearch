@@ -279,3 +279,11 @@ TEST_CASE("config file not found", "[options]") {
 
     REQUIRE_THROWS_AS(o.getopt(), std::ios_base::failure);
 }
+
+TEST_CASE("validate - update option alone ok", "[options]") {
+    const char* argv[] = { "", "-u" };
+    Pdfsearch::Options o(2, const_cast<char**>(argv));
+    o.getopt();
+
+    REQUIRE_NOTHROW(o.validate());
+}
