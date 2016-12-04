@@ -34,3 +34,4 @@ missing
 config.h
 tests/catch
 tests/catch.trs
+config.*
