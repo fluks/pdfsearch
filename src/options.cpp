@@ -62,7 +62,7 @@ Pdfsearch::Options::parseConfigOption() {
         { 0, 0, 0, 0 }
     };
 
-    char c;
+    int c;
     while ((c = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
         if (c == 'c') {
             config = optarg;
@@ -94,7 +94,7 @@ Pdfsearch::Options::getopt() {
         { 0, 0, 0, 0 }
     };
 
-    char c;
+    int c;
     while ((c = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
         std::ostringstream error;
         switch (c) {
