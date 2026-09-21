@@ -131,7 +131,8 @@ TEST_CASE("integer overflow", "[options]") {
     long long l = std::numeric_limits<int>::max() + 1LL;
     std::ostringstream oss;
     oss << l;
-    const char* argv[] = { "", "-r", oss.str().c_str() };
+    std::string bigger_than_int = oss.str();
+    const char* argv[] = { "", "-r", bigger_than_int.c_str() };
     Pdfsearch::Options o(3, const_cast<char**>(argv));
 
     REQUIRE_THROWS_AS(o.getopt(), std::invalid_argument);
